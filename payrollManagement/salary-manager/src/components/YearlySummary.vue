@@ -10,11 +10,11 @@
                 </div>
                 <div class="bg-white shadow-md rounded-lg p-6 w-64 text-center">
                     <p class="text-gray-500">総額控除</p>
-                    <p class="text-2lx font-bold text-red-600">{{ totalDeduction.toLocaleString() }}</p>
+                    <p class="text-2xl font-bold text-red-600">{{ totalDeduction.toLocaleString() }}</p>
                 </div>
                 <div class="bg-white shadow-md rounded-lg p-6 w-64 text-center">
                     <p class="text-gray-500">総額手取</p>
-                    <p class="text-2lx font-bold text-green-600"> {{ netIncome.toLocaleString() }}</p>
+                    <p class="text-2xl font-bold text-green-600"> {{ netIncome.toLocaleString() }}</p>
                 </div>
         </div>
 
@@ -29,7 +29,10 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="row in monthlyData" :key="row.month">
+                <tr v-for="row in monthlyData"
+                    :key="row.month"
+                    class="hover:bg-gray-100 cursor-pointer"
+                    @click="$router.push({ path: `/salary/${year}/${row.month}` })">
                     <td class="border p-2">{{ row.month }}</td>
                     <td class="border p-2 text-blue-600">{{ row.income.toLocaleString() }}</td>
                     <td class="border p-2 text-red-600">{{ row.deduction.toLocaleString() }}</td>
@@ -45,66 +48,49 @@
     import axios from 'axios'
 
     const year = new Date().getFullYear()
+    const monthlyData = ref([])
     const totalIncome = ref(0)
     const totalDeduction = ref(0)
     const netIncome = ref(0)
 
+    defineEmits(['select-month'])
+
     onMounted(async () => {
         try {
-            const res =await axios.get(`http://127.0.0.1:5000/api/salaries/${year}`)
+            const res =await axios.get('http://127.0.0.1:5000/api/salaries', {params: { year }})
             const raw = res.data
 
-            totalIncome.value = raw.reduce((sum, row) =>
-                sum + row.base_salary + row.overtime_pay + row.employment_insurance + row.social_insurance + row.income_tax + row.deduction_other - row.refund, 0
-            )
+            totalIncome.value = raw.reduce((s,r)=>
+            s + r.base_salary + r.overtime_pay + r.allowances + r.transport +
+                r.expense_reimburse + r.income_other , 0)
+
+            totalDeduction.value = raw.reduce((s,r)=>
+            s + r.health_insurance + r.pension + r.employment_insurance +
+                r.nursing_insurance + r.social_insurance + r.income_tax +
+                r.resident_tax + r.deduction_other - r.refund , 0)
 
             netIncome.value = totalIncome.value - totalDeduction.value
 
+            const months = ['01','02','03','04','05','06','07','08','09','10','11','12','夏季賞与','冬季賞与','特別賞与']
             const summary = []
-            let incomeSum = 0
-            let deductionSum = 0
 
-            for (const m of ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月', '夏季賞与', '冬季賞与', '特別賞与']) {
-                const rows = raw.filter(row => row.month === m)
+            for (const m of months) {
+                const rows = raw.filter(r => r.month === m)
 
-                const income = rows.reduce((sum, r) =>
-                    sum +
-                    r.base_salary +
-                    r.overtime_pay +
-                    r.allowances +
-                    r.transport +
-                    r.expense_reimburse +
-                    r.income_other, 0
-                )
+                const income = rows.reduce((s,r)=>
+                    s + r.base_salary + r.overtime_pay + r.allowances + r.transport +
+                        r.expense_reimburse + r.income_other , 0)
 
-                const deduction = rows.reduce((sum, r) =>
-                    sum +
-                    r.health_insurance +
-                    r.pension +
-                    r.employment_insurance +
-                    r.nursing_insurance +
-                    r.social_insurance +
-                    r.income_tax +
-                    r.resident_tax +
-                    r.deduction_other -
-                    r.refund, 0
-                )
+                const deduction = rows.reduce((s,r)=>
+                    s + r.health_insurance + r.pension + r.employment_insurance +
+                        r.nursing_insurance + r.social_insurance + r.income_tax +
+                        r.resident_tax + r.deduction_other - r.refund , 0)
 
-                incomeSum += income
-                deductionSum += deduction
-
-                summary.push({
-                    month: m,
-                    income,
-                    deduction
-                })
+                summary.push({ month: m, income, deduction })
             }
 
-            monthlyData.value = summary
-            totalIncome.value = incomeSum
-            totalDeduction.value = deductionSum
-            netIncome.value = incomeSum - deductionSum
 
+            monthlyData.value = summary
         } catch (err) {
             console.error("データの取得に失敗しました", err)
         }
