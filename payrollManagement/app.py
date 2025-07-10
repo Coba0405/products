@@ -53,5 +53,14 @@ def create_salary():
     conn.close()
     return jsonify({'message': "給与明細を登録しました"}), 201
 
+@app.route('/api/salaries/<int:year>', methods=['GET'])
+def get_salaries_by_year(year):
+    conn = get_db_connection()
+    salaries = conn.execute(
+        'SELECT * FROM salaries WHERE year = ? ORDER BY month', (year,)
+    ).fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in salaries])
+
 if __name__ == '__main__':
     app.run(debug=True)

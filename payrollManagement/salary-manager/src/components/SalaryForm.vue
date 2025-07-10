@@ -1,39 +1,48 @@
 <template>
-    <form @submit.prevent="submitForm">
-        <h2 class="text-xl font-bold mb-4">給与明細　登録フォーム</h2>
+    <div>
+      <h2 class="text-xl font-bold mb-4">月を選択してください</h2>
+      <div class="mb-4 flex flex-col gap-2 items-start">
+        <button
+          v-for="m in months"
+          :key = "m"
+          @click="selectMonth(m)"
+          class="px-3 py-1 border rounded bg-yellow-100 hover:bg-blue-200 w-full text-left"
+        >
+          {{ m }}
+        </button>
+      </div>
+      <form @submit.prevent="submitForm">
+        <div v-if="isMonthSelected">
+          <div class="mb-2">
+              <label>会社名: <input v-model="form.company" type="text" required /></label>
+          </div>
 
-        <div class="mb-2">
-            <label>年: <input v-model="form.year" type="number" min="2000" max="2099" required /></label>
-        </div>
+          <div class="mb-2">
+              <label>基本給: <input v-model.number="form.base_salary" type="number" /></label>
+          </div>
 
-        <div class="mb-2">
-            <label>月:
-                <selsect v-model ="form.month" required>
-                    <option v-for="m in months" :key="m" :value="m">{{ m }}</option>
-                </selsect>
-            </label>
-        </div>
+          <div class="mb-2">
+              <label>時間外勤務: <input v-model.number="form.overtime_pay" type="number" /></label>
+          </div>
 
-        <div class="mb-2">
-            <label>会社名: <input v-model="form.company" type="text" required /></label>
-        </div>
+          <div class="mb-2">
+              <label>休日出勤: <input v-model.number="form.holiday_work" type="number" /></label>
+          </div>
 
-        <div class="mb-2">
-            <label>基本給: <input v-model.number="form.base_salary" type="number" /></label>
-        </div>
+          <!-- 他の項目も後ほどここに追加 -->
 
-        <div class="mb-2">
-            <label>時間外勤務: <input v-model.number="form.overtime_pay" type="number" /></label>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">登録</button>
         </div>
-        <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">登録</button>
-    </form>
+      </form>
+    </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref, watch } from 'vue'
+const isMonthSelected = ref((false))
 import axios from 'axios'
 
-const months = ['01','02','03','04','05','06','07','08','09','10','11','12', '夏季賞与', '冬季賞与', '特別賞与']
+const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月', '夏季賞与', '冬季賞与', '特別賞与']
 
 const form = reactive({
   year: new Date().getFullYear(),
@@ -61,6 +70,13 @@ const form = reactive({
   overtime_out: '',
   holiday_work: '',
   memo: ''
+})
+
+// monthが変化したら自動でisMonthSelectedをtrueにする
+watch(() => form.month, (newVal) => {
+  if (newVal) {
+    isMonthSelected.value = true
+  }
 })
 
 const submitForm = async () => {
