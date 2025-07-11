@@ -57,7 +57,7 @@
 
     onMounted(async () => {
         try {
-            const res =await axios.get('http://127.0.0.1:5000/api/salaries', {params: { year }})
+            const res =await axios.get('/api/salaries', {params: { year }})
             const raw = res.data
 
             totalIncome.value = raw.reduce((s,r)=>

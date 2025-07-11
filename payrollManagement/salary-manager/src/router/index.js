@@ -3,8 +3,8 @@ import YearlySummary from '../components/YearlySummary.vue'
 import SalaryView from '../components/SalaryView.vue'
 
 const routes = [
-    {path: '/', component: YearlySummary},
-    {path: '/salary/:year/:month', SalaryView, props: true }
+    { path: '/', component: YearlySummary },
+    { path: '/salary/:year/:month', component: SalaryView, props: true }
 ]
 
 export default createRouter({
