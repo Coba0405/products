@@ -53,15 +53,14 @@ def create_salary():
     conn.close()
     return jsonify({'message': "給与明細を登録しました"}), 201
 
-@app.route('/api/salaries/<int:year>/<month>', methods=['GET'])
-def get_salaries_by_year_month(year, month):
+@app.route('/api/salaries/<int:item_id>', methods=['GET'])
+def get_salary(item_id):
     conn = get_db_connection()
-    rows = conn.execute(
-        'SELECT * FROM salaries WHERE year = ? AND month = ?',
-        (year, month)
-    ).fetchall()
+    row = conn.execute('SELECT * FROM salaries WHERE id = ?', (item_id,)).fetchone()
     conn.close()
-    return jsonify([dict(row) for row in rows])
+    if row:
+        return jsonify(dict(row))
+    return jsonify({'error': 'not found'}), 404
 
 @app.route('/api/salaries/<int:year>', methods=['GET'])
 def get_salaries_by_year(year):
@@ -72,12 +71,15 @@ def get_salaries_by_year(year):
     conn.close()
     return jsonify([dict(r) for r in rows])
 
-@app.route('/api/salaries/<int:item_id>', methods=['GET'])
-def get_salary(item_id):
-    conn = get_db_connection
-    row = conn.execute('SELECT * FROM salaries WHERE id = ?', (item_id)).fetchone()
+@app.route('/api/salaries/<int:year>/<month>', methods=['GET'])
+def get_salaries_by_year_month(year, month):
+    conn = get_db_connection()
+    rows = conn.execute(
+        'SELECT * FROM salaries WHERE year = ? AND month = ?',
+        (year, month)
+    ).fetchall()
     conn.close()
-    return jsonify(dict(row)) if row else ('', 404)
+    return jsonify([dict(row) for row in rows])
 
 @app.route('/api/salaries/<int:item_id>', methods=['PUT'])
 def update_salary(item_id):

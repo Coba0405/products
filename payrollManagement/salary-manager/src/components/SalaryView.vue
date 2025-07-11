@@ -1,7 +1,6 @@
 <template>
     <div v-if="detail" class="p-6">
     <router-link
-        v-if="detail"
         :to="`/salary/${detail.id}/edit`"
         class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4"
     >

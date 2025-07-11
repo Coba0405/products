@@ -57,8 +57,7 @@
 
     onMounted(async () => {
         try {
-            const { data: raw } =await axios.get(`/api/salaries/${ year }`)
-            // const raw = res.data
+            const { data: raw } = await axios.get('/api/salaries', { params: { year } })
 
             totalIncome.value = raw.reduce((s,r)=>
             s + r.base_salary + r.overtime_pay + r.allowances + r.transport +
