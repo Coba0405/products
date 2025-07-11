@@ -10,7 +10,7 @@
         <label class="block text-sm mb-1">会社名</label>
         <input v-model.number="form.company" type="text" class="input" required />
       </div>
-      
+
       <div>
         <label class="block text-sm mb-1">基本給</label>
         <input v-model.number="form.base_salary" type="number" class="input" />
@@ -23,11 +23,11 @@
 
       <div>
         <label class="block text-sm mb-1">休日出勤</label>
-        <input v-model.number="form.overtime_pay" type="number" class="input" />
+        <input v-model.number="form.holiday_work" type="number" class="input" />
       </div>
 
       <!-- 他の項目も後ほどここに追加 -->
-      
+
       <div class="flex justify-end gap-3 pt-4">
         <button type="button" @click="$emit('close')" class="text-sm text-gray-500">閉じる</button>
         <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded">登録</button>
@@ -37,13 +37,14 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { defineProps, reactive, onMounted } from 'vue'
 import axios from 'axios'
 
 // propsで年と年を受け取る
 const props =defineProps({
   initialYear: { type: Number, required: true },
-  initialMonth: {type: String, required: true}
+  initialMonth: {type: String, required: true},
+  id: String
 })
 
 // 登録後or閉じる用のemit
@@ -59,15 +60,27 @@ const form = reactive({
   holiday_work: 0
 })
 
+onMounted(async () => {
+  if (props.id) {
+    const { data } =await axios.get(`/apo/salaries/${props.id}`)
+    Object.assign(form, data)
+  }
+})
+
 async function submitForm (){
   try {
-    await axios.post('http://127.0.0.1:5000/api/salaries', form)
-    alert('登録成功')
-    // 親コンポーネント(App.vue)にフォームを閉じるように通知
+    if (props.id) {
+      await axios.put(`/api/salaries/${props.id}`, form)
+      alert('更新しました')
+    } else {
+      await axios.post('/api/salaries', form)
+      alert('登録しました')
+    }
     emit('close')
-  } catch (err) {
-    alert('登録失敗')
+  }
+  catch (err) {
     console.error(err)
+    alert('通信に失敗しました')
   }
 }
 </script>

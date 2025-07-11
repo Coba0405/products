@@ -63,5 +63,39 @@ def get_salaries_by_year_month(year, month):
     conn.close()
     return jsonify([dict(row) for row in rows])
 
+@app.route('/api/salaries/<int:year>', methods=['GET'])
+def get_salaries_by_year(year):
+    conn = get_db_connection()
+    rows = conn.execute(
+        'SELECT * FROM salaries WHERE year = ?', (year,)
+    ).fetchall()
+    conn.close()
+    return jsonify([dict(r) for r in rows])
+
+@app.route('/api/salaries/<int:item_id>', methods=['GET'])
+def get_salary(item_id):
+    conn = get_db_connection
+    row = conn.execute('SELECT * FROM salaries WHERE id = ?', (item_id)).fetchone()
+    conn.close()
+    return jsonify(dict(row)) if row else ('', 404)
+
+@app.route('/api/salaries/<int:item_id>', methods=['PUT'])
+def update_salary(item_id):
+    data = request.get_json()
+    conn = get_db_connection()
+    conn.execute("""
+        UPDATE salaries SET
+          year=?, month=?, company=?,
+          base_salary=?, overtime_pay=?, allowances=?, transport=?, expense_reimburse=?, income_other=?,
+          health_insurance=?, pension=?, employment_insurance=?, nursing_insurance=?, social_insurance=?,
+          income_tax=?, resident_tax=?, deduction_other=?, refund=?,
+          working_days=?, paid_leave=?, working_hours=?, overtime_in=?, overtime_out=?, holiday_work=?,
+          memo=?
+        WHERE id=?
+    """, (*data.values(), item_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'updated'})
+
 if __name__ == '__main__':
     app.run(debug=True)

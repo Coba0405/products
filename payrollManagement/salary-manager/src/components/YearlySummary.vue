@@ -57,8 +57,8 @@
 
     onMounted(async () => {
         try {
-            const res =await axios.get('/api/salaries', {params: { year }})
-            const raw = res.data
+            const { data: raw } =await axios.get(`/api/salaries/${ year }`)
+            // const raw = res.data
 
             totalIncome.value = raw.reduce((s,r)=>
             s + r.base_salary + r.overtime_pay + r.allowances + r.transport +
@@ -71,7 +71,7 @@
 
             netIncome.value = totalIncome.value - totalDeduction.value
 
-            const months = ['01','02','03','04','05','06','07','08','09','10','11','12','夏季賞与','冬季賞与','特別賞与']
+            const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月','夏季賞与','冬季賞与','特別賞与']
             const summary = []
 
             for (const m of months) {

@@ -4,7 +4,8 @@ import SalaryView from '../components/SalaryView.vue'
 
 const routes = [
     { path: '/', component: YearlySummary },
-    { path: '/salary/:year/:month', component: SalaryView, props: true }
+    { path: '/salary/:year/:month', component: SalaryView, props: true },
+    { path: '/salary/:id/edit', component: SalaryView, props: true }
 ]
 
 export default createRouter({
