@@ -162,3 +162,46 @@ async function submitForm (){
   }
 }
 </script>
+
+<!-- <script setup>
+import { reactive, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
+
+const route  = useRoute()
+const router = useRouter()
+
+// id が props で来るかもしれない
+const id = route.params.id || null
+
+// year, month はクエリで ?year=2025&month=8月 の形
+const initialYear  = Number(route.query.year)  || new Date().getFullYear()
+const initialMonth =       route.query.month   || ''
+
+const form = reactive({
+  year:          initialYear,
+  month:         initialMonth,
+  company:       '',
+  base_salary:   0,
+  overtime_pay:  0,
+  /* 以降すべて初期化 */
+})
+
+onMounted(async () => {
+  if (id) {
+    const { data } = await axios.get(`/api/salaries/${id}`)
+    Object.assign(form, data)
+  }
+})
+
+async function submitForm() {
+  if (id) {
+    await axios.put(`/api/salaries/${id}`, form)
+    alert('更新しました')
+  } else {
+    await axios.post('/api/salaries', form)
+    alert('登録しました')
+  }
+  router.back()          // 登録後に元の画面へ戻す例
+}
+</script> -->

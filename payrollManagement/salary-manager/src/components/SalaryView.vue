@@ -4,7 +4,7 @@
         :to="`/salary/${detail.id}/edit`"
         class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4"
     >
-        編集
+        {{ detail.id ? '編集' : '新規入力' }}
     </router-link>
 
         <h2 class="text-3xl text-left font-bold mb-4">
@@ -41,20 +41,35 @@ const props = defineProps({
     month: String
 })
 
+const blankDetail = {
+  id:        null,
+  company:   '',
+  base_salary: 0,  overtime_pay: 0,  allowances: 0,  transport: 0,
+  expense_reimburse: 0,  income_other: 0,
+  health_insurance: 0,   pension: 0,  employment_insurance: 0,
+  nursing_insurance: 0,  social_insurance: 0,
+  income_tax: 0,  resident_tax: 0,  deduction_other: 0,  refund: 0,
+  working_days: 0, paid_leave: 0, working_hours: 0,
+  overtime_in: '', overtime_out: '', holiday_work: '',
+  memo: '',
+  year: props.year,   // ← ここは受け取った値で上書き
+  month: props.month
+}
+
 const detail = ref(null)
 const isError = ref(false)
 
 // API呼び出し（階層　URL版）
 onMounted(async () => {
-    try {
-        const { data } = await axios.get(`/api/salaries/${props.year}/${props.month}`)
-        // res.dataは配列なので0要素目を取り出す
-        detail.value = data[0] ?? null
-    }
-    catch (e) {
-        isError.value = true
-        console.error('明細取得失敗', e)
-    }
+  try {
+    const { data } = await axios.get(
+      `/api/salaries/${props.year}/${encodeURIComponent(props.month)}`
+    )
+    detail.value = data[0] ?? { ...blankDetail }        // ★ fallback
+  } catch (e) {
+    isError.value = true
+    console.error('明細取得失敗', e)
+  }
 })
 
 const fmt = v => typeof v === 'number' ? v.toLocaleString() + ' 円' : v
