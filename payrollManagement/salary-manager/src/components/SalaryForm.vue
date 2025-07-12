@@ -12,7 +12,7 @@
         <input v-model="form.company" type="text" class="input bg-gray-300" required />
       </div>
 
-      <!-- ───── 収入 ───── -->
+      <h3>支給</h3>
       <div>
         <label class="block text-sm mb-1">基本給</label>
         <input v-model.number="form.base_salary" type="number" class="input bg-gray-300" />
@@ -43,7 +43,7 @@
         <input v-model.number="form.income_other" type="number" class="input bg-gray-300" />
       </div>
 
-      <!-- ───── 控除 ───── -->
+      <h3>控除</h3>
       <div>
         <label class="block text-sm mb-1">健康保険料</label>
         <input v-model.number="form.health_insurance" type="number" class="input bg-gray-300" />
@@ -89,7 +89,7 @@
         <input v-model.number="form.refund" type="number" class="input bg-gray-300" />
       </div>
 
-      <!-- ───── 勤怠 ───── -->
+      <h3>勤怠</h3>
       <div>
         <label class="block text-sm mb-1">勤務日数</label>
         <input v-model.number="form.working_days" type="number" class="input bg-gray-300" />
@@ -184,7 +184,7 @@ const form = reactive({
 /* ---------- 既存データの読み込み ---------- */
 onMounted(async () => {
   if (id) {
-    const { data } = await axios.get(`/api/salary/${id}`)
+    const { data } = await axios.get(`/api/salaries/${id}`)
     if (data && data.id) {
       Object.assign(form, data)
     } else {
@@ -200,7 +200,7 @@ const month = computed(() => form.month)
 /* ---------- 送信 ---------- */
 async function submitForm () {
   if (id) {
-    await axios.put(`/api/salary/${id}`, form)
+    await axios.put(`/api/salaries/${id}`, form)
     alert('更新しました')
   } else {
     await axios.post('/api/salaries', form)

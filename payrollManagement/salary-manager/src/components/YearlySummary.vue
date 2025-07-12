@@ -57,9 +57,13 @@
 
 <script setup>
     import { ref, watch } from 'vue'
+    import { useRoute, useRouter } from 'vue-router'
     import axios from 'axios'
 
-    const currentYear = ref(new Date().getFullYear())
+    const route = useRoute()
+    const router = useRouter()
+    const currentYear = ref(route.query.year ? Number(route.query.year) : new Date().getFullYear())
+
     const monthlyData = ref([])
     const totalIncome = ref(0)
     const totalDeduction = ref(0)
@@ -67,11 +71,18 @@
 
     defineEmits(['select-month'])
 
+    watch(
+        () => route.query.year,
+        (v) => {
+            if (v) currentYear.value = Number(v)
+        }
+    )
+
     async function loadYearData () {
         try {
             // `?year=` でフィルタして その年だけ取得
-            const { data: raw } = await axios.get('/api/salaries', {
-                params: { year: currentYear.value }
+            const { data: raw } = await axios.get('/api/salaries',
+                { params:{ year: currentYear.value }
             })
 
             /* ─ 総計 ─ */
@@ -114,6 +125,7 @@
     watch(currentYear, loadYearData, { immediate:true })
 
     function changeYear(delta){ currentYear.value += delta }
+    router.push({ path:'/', query:{ year: currentYear.value }})
 </script>
 
 <script>

@@ -4,8 +4,6 @@
         v-if="detail.id"
         :to="{ name: 'salary-edit', params: { id: detail.id } }"
         class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4">
-        <!-- :to="`/salary/${detail.id}/edit`"
-        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4"> -->
         編集
     </router-link>
 
@@ -45,6 +43,13 @@
             />
             <Section title="メモ" :rows="memoRows" />
         </div>
+
+        <button
+            @click="goBack"
+            class="mb-4 inline-flex items-center gap-1 text-blue-600 hover:underline"
+        >
+            <span>{{ year }}年一覧へ戻る</span>
+        </button>
     </div>
 
     <p v-else-if="isError" class="text-red-500">データの取得に失敗しました</p>
@@ -53,7 +58,7 @@
 
 <script setup>
 import { defineProps, onMounted, ref, computed } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useLink } from 'vue-router'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import Section from './Section.vue'
@@ -64,6 +69,11 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const year = computed(() => props.year)
+
+function goBack () {
+    router.push({ path: '/', query: { year: props.year }})
+}
 
 const blankDetail = {
   id:        null,
