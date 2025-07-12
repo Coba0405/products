@@ -19,10 +19,41 @@ def get_db_connection():
 
 @app.route('/api/salaries', methods=['GET'])
 def get_salaries():
-    conn = get_db_connection()
-    salaries = conn.execute('SELECT * FROM salaries ORDER BY year DESC, month DESC').fetchall()
+    year  = request.args.get('year',  type=int)   # 無いときは None
+    month = request.args.get('month')             # 無いときは None
+
+    # --- 条件式を可変で組み立てる ---
+    where   = []
+    params  = []
+
+    if year is not None:          # 0 とは区別。int に変換済み
+        where.append('year = ?')
+        params.append(year)
+
+    if month:                     # 空文字 '' は弾く
+        where.append('month = ?')
+        params.append(month)
+
+    sql = 'SELECT * FROM salaries'
+    if where:                     # 条件が 1 つでもあれば WHERE 句を付ける
+        sql += ' WHERE ' + ' AND '.join(where)
+    sql += ' ORDER BY year DESC, month DESC'
+
+    conn  = get_db_connection()
+    rows  = conn.execute(sql, params).fetchall()
     conn.close()
-    return jsonify([dict(row) for row in salaries])
+
+    return jsonify([dict(r) for r in rows])
+
+@app.route('/api/salaries/<int:year>/<month>', methods=['GET'])
+def get_salaries_by_year_month(year, month):
+    conn = get_db_connection()
+    rows = conn.execute(
+        'SELECT * FROM salaries WHERE year = ? AND month = ?',
+        (year, month)
+    ).fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in rows])
 
 @app.route('/api/salaries', methods=['POST'])
 def create_salary():
@@ -92,68 +123,6 @@ def salary_by_id(item_id):
     conn.commit()
     conn.close()
     return jsonify({'message': 'updated', 'id':item_id})
-
-# @app.route('/api/salary/<int:item_id>', methods=['GET'])
-# def get_salary(item_id):
-#     conn = get_db_connection()
-#     row = conn.execute('SELECT * FROM salaries WHERE id = ?', (item_id,)).fetchone()
-#     conn.close()
-#     if row:
-#         return jsonify(dict(row))
-#     return jsonify({'error': 'not found'}), 404
-
-@app.route('/api/salaries/<int:year>/<month>', methods=['GET'])
-def get_salaries_by_year_month(year, month):
-    conn = get_db_connection()
-    rows = conn.execute(
-        'SELECT * FROM salaries WHERE year = ? AND month = ?',
-        (year, month)
-    ).fetchall()
-    conn.close()
-    return jsonify([dict(row) for row in rows])
-
-@app.route('/api/salaries/<int:year>', methods=['GET'])
-def get_salaries_by_year(year):
-    conn = get_db_connection()
-    rows = conn.execute(
-        'SELECT * FROM salaries WHERE year = ?', (year,)
-    ).fetchall()
-    conn.close()
-    return jsonify([dict(r) for r in rows])
-
-# @app.route('/api/salary/<int:item_id>', methods=['PUT'])
-# def update_salary(item_id):
-#     data = request.get_json()
-#     conn = get_db_connection()
-#     conn.execute("""
-#         UPDATE salaries SET
-#           year=?, month=?, company=?,
-#           base_salary=?, overtime_pay=?, allowances=?, transport=?, expense_reimburse=?, income_other=?,
-#           health_insurance=?, pension=?, employment_insurance=?, nursing_insurance=?, social_insurance=?,
-#           income_tax=?, resident_tax=?, deduction_other=?, refund=?,
-#           working_days=?, paid_leave=?, working_hours=?, overtime_in=?, overtime_out=?, holiday_work=?,
-#           memo=?
-#         WHERE id=?
-#     """, (data['year'], data['month'], data['company'],
-#           data['base_salary'], data['overtime_pay'], data['allowances'], data['transport'],
-#           data['expense_reimburse'], data['income_other'],
-#           data['health_insurance'], data['pension'], data['employment_insurance'],
-#           data['nursing_insurance'], data['social_insurance'],
-#           data['income_tax'], data['resident_tax'], data['deduction_other'], data['refund'],
-#           data['working_days'], data['paid_leave'], data['working_hours'],
-#           data['overtime_in'], data['overtime_out'], data['holiday_work'],
-#           data['memo'], item_id))
-#     conn.commit()
-#     conn.close()
-#     return jsonify({'message': 'updated'})
-
-# @app.route('/api/salaries/<int:item_id>', methods=['DELETE'])
-# def delete_salary(item_id):
-#     conn = get_db_connection()
-#     conn.exceute("DELETE FROM salaries WHERE id = ?", (item_id,))
-#     conn.commit()
-#     conn.close()
-#     return jsonify({'message': 'deleted', 'id': item_id})
 
 if __name__ == '__main__':
     app.run(debug=True)
