@@ -48,7 +48,7 @@
                     <td class="border p-2">{{ row.month }}</td>
                     <td class="border p-2 text-blue-600">{{ row.income.toLocaleString() }}</td>
                     <td class="border p-2 text-red-600">{{ row.deduction.toLocaleString() }}</td>
-                    <td class="border p-2">{{ (row.income - row.deduction).toLocaleString() }}</td>
+                    <td class="border p-2 text-green-600">{{ (row.income - row.deduction).toLocaleString() }}</td>
                 </tr>
             </tbody>
         </table>

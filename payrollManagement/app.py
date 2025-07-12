@@ -64,18 +64,17 @@ def create_salary():
         INSERT INTO salaries (
             year, month, company,
             base_salary, overtime_pay, allowances, transport, expense_reimburse, income_other,
-            health_insurance, pension, employment_insurance, nursing_insurance, social_insurance,
+            health_insurance, pension, employment_insurance, nursing_insurance,
             income_tax, resident_tax, deduction_other, refund,
             working_days, paid_leave, working_hours, overtime_in, overtime_out, holiday_work,
             memo
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data['year'], data['month'], data['company'],
         data['base_salary'], data['overtime_pay'], data['allowances'], data['transport'],
         data['expense_reimburse'], data['income_other'],
         data['health_insurance'], data['pension'], data['employment_insurance'],
-        data['nursing_insurance'], data['social_insurance'],
-        data['income_tax'], data['resident_tax'], data['deduction_other'], data['refund'],
+        data['nursing_insurance'], data['income_tax'], data['resident_tax'], data['deduction_other'], data['refund'],
         data['working_days'], data['paid_leave'], data['working_hours'],
         data['overtime_in'], data['overtime_out'], data['holiday_work'],
         data['memo']
@@ -98,7 +97,7 @@ def salary_by_id(item_id):
         conn.execute("""UPDATE salaries SET
               year=?, month=?, company=?,
               base_salary=?, overtime_pay=?, allowances=?, transport=?, expense_reimburse=?, income_other=?,
-              health_insurance=?, pension=?, employment_insurance=?, nursing_insurance=?, social_insurance=?,
+              health_insurance=?, pension=?, employment_insurance=?, nursing_insurance=?,
               income_tax=?, resident_tax=?, deduction_other=?, refund=?,
               working_days=?, paid_leave=?, working_hours=?, overtime_in=?, overtime_out=?, holiday_work=?,
               memo=? WHERE id=?""",
@@ -107,8 +106,7 @@ def salary_by_id(item_id):
               d['base_salary'], d['overtime_pay'], d['allowances'], d['transport'],
               d['expense_reimburse'], d['income_other'],
               d['health_insurance'], d['pension'], d['employment_insurance'],
-              d['nursing_insurance'], d['social_insurance'],
-              d['income_tax'], d['resident_tax'], d['deduction_other'], d['refund'],
+              d['nursing_insurance'],d['income_tax'], d['resident_tax'], d['deduction_other'], d['refund'],
               d['working_days'], d['paid_leave'], d['working_hours'],
               d['overtime_in'], d['overtime_out'], d['holiday_work'],
               d['memo'], item_id

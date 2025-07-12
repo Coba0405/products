@@ -81,8 +81,7 @@ const blankDetail = {
   base_salary: 0,  overtime_pay: 0,  allowances: 0,  transport: 0,
   expense_reimburse: 0,  income_other: 0,
   health_insurance: 0,   pension: 0,  employment_insurance: 0,
-  nursing_insurance: 0,  social_insurance: 0,
-  income_tax: 0,  resident_tax: 0,  deduction_other: 0,  refund: 0,
+  nursing_insurance: 0, income_tax: 0,  resident_tax: 0,  deduction_other: 0,  refund: 0,
   working_days: 0, paid_leave: 0, working_hours: 0,
   overtime_in: '', overtime_out: '', holiday_work: '',
   memo: '',
@@ -130,7 +129,6 @@ const deductDetailRows = computed(() => detail.value ? [
   ['厚生年金保険料',detail.value.pension],
   ['雇用保険料',    detail.value.employment_insurance],
   ['介護保険料',    detail.value.nursing_insurance],
-  ['社会保険料',    detail.value.social_insurance],
   ['所得税',        detail.value.income_tax],
   ['住民税',        detail.value.resident_tax],
   ['その他控除',    detail.value.deduction_other],
@@ -179,7 +177,7 @@ async function onDelete () {
     try {
         await axios.delete(`/api/salaries/${detail.value.id}`)
         alert('削除しました')
-        await router.push('/')
+        await router.push({ path: '/', query: { year: props.year } })
     } catch (e) {
         alert('削除に失敗しました')
         console.error(e)

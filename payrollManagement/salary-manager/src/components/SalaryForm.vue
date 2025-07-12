@@ -65,11 +65,6 @@
       </div>
 
       <div>
-        <label class="block text-sm mb-1">社会保険料</label>
-        <input v-model.number="form.social_insurance" type="number" class="input bg-gray-300" />
-      </div>
-
-      <div>
         <label class="block text-sm mb-1">所得税</label>
         <input v-model.number="form.income_tax" type="number" class="input bg-gray-300" />
       </div>
