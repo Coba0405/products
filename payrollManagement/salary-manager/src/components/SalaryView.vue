@@ -1,14 +1,35 @@
 <template>
     <div v-if="detail" class="p-6">
     <router-link
-        :to="`/salary/${detail.id}/edit`"
-        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4"
-    >
-        {{ detail.id ? '編集' : '新規入力' }}
+        v-if="detail.id"
+        :to="{ name: 'salary-edit', params: { id: detail.id } }"
+        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4">
+        <!-- :to="`/salary/${detail.id}/edit`"
+        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4"> -->
+        編集
     </router-link>
 
+        <!-- ② レコードが無い月は「新規入力」ボタン -->
+    <router-link
+        v-else
+        :to="{
+                path: '/salary/new',
+                query: { year: props.year, month: props.month }
+            }"
+        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4">
+        新規入力
+    </router-link>
+
+    <button
+        v-if="detail?.id"
+        @click="onDelete"
+        class="mt-6 bg-red-600 text-white px-3 py-1 rounded"
+    >
+        削除
+    </button>
+
         <h2 class="text-3xl text-left font-bold mb-4">
-            {{ props.year }}年 {{ props.month }} 月明細
+            {{ props.year }}年 {{ props.month }} 明細
         </h2>
         <p>会社名: {{ detail.company }}</p>
 
@@ -33,6 +54,7 @@
 <script setup>
 import { defineProps, onMounted, ref, computed } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import Section from './Section.vue'
 
@@ -40,6 +62,8 @@ const props = defineProps({
     year: String,
     month: String
 })
+
+const router = useRouter()
 
 const blankDetail = {
   id:        null,
@@ -65,7 +89,7 @@ onMounted(async () => {
     const { data } = await axios.get(
       `/api/salaries/${props.year}/${encodeURIComponent(props.month)}`
     )
-    detail.value = data[0] ?? { ...blankDetail }        // ★ fallback
+    detail.value = data[0] ?? { ...blankDetail }
   } catch (e) {
     isError.value = true
     console.error('明細取得失敗', e)
@@ -138,4 +162,17 @@ const netRows = computed(() => [[
     '差引支給額',
     fmt(incomeTotal.value - deductTotal.value)
 ]])
+
+async function onDelete () {
+    if (!confirm('本当に削除しますか？')) return
+
+    try {
+        await axios.delete(`/api/salaries/${detail.value.id}`)
+        alert('削除しました')
+        await router.push('/')
+    } catch (e) {
+        alert('削除に失敗しました')
+        console.error(e)
+    }
+}
 </script>
