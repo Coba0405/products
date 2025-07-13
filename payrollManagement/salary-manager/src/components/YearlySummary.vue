@@ -13,6 +13,13 @@
                 ▶️
             </button>
         </div>
+        <YearLineChart
+            :labels="labels"
+            :income="incomes"
+            :deduction="deductions"
+            :net="nets"
+            class="my-6"
+        />
 
         <!-- 合計部分 -->
         <div class="flex flex-wrap justify-center gap-6">
@@ -56,9 +63,15 @@
 </template>
 
 <script setup>
-    import { ref, watch } from 'vue'
-    import { useRoute, useRouter } from 'vue-router'
-    import axios from 'axios'
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
+import YearLineChart from './YearLineChart.vue'
+
+    const labels = ref([])
+    const incomes = ref([])
+    const deductions = ref([])
+    const nets = ref([])
 
     const route = useRoute()
     const router = useRouter()
@@ -117,15 +130,33 @@
 
             return { month: m, income, deduction }
             })
+
+            /* ====▼ 追加：グラフ用データを別に組み立てる ========= */
+            const REG_MONTH = /^\d+月$/                 // 1〜12月だけマッチ
+            const onlyMonthRows = monthlyData.value.filter(r => REG_MONTH.test(r.month))
+
+            // グラフ用ラベルと数値配列
+            labels.value     = onlyMonthRows.map(r => r.month)
+            incomes.value  = onlyMonthRows.map(r => +r.income)
+            deductions.value  = onlyMonthRows.map(r => +r.deduction)
+            nets.value     = onlyMonthRows.map(r => +(r.income - r.deduction))
         } catch (err) {
             console.error('年データ取得失敗', err)
         }
+
+        // console.log('labels', labels.value)
+        // console.log('incomes', incomes.value)
+        // console.log('deductions', deductions.value)
+        // console.log('nets', nets.value)
     }
 
     watch(currentYear, loadYearData, { immediate:true })
 
-    function changeYear(delta){ currentYear.value += delta }
-    router.push({ path:'/', query:{ year: currentYear.value }})
+    function changeYear(delta){
+        currentYear.value += delta,
+        router.replace({ path:'/', query:{ year: currentYear.value } })
+    }
+
 </script>
 
 <script>
