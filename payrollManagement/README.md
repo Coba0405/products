@@ -1,30 +1,31 @@
-#   目的
-・⽉ごとの給与・控除内訳をクラウド（SQLite）に登録
-・年単位の所得集計／グラフによる可視化
-・編集／削除／新規登録をフロントエンドで完結できるよう実装
+##   目的
+ - ⽉ごとの給与・控除内訳をクラウド（SQLite）に登録
+ - 年単位の所得集計／グラフによる可視化
+ - 編集／削除／新規登録をフロントエンドで完結できるよう実装
 
-#   機能概要
-1	年別ダッシュボード	総収入・総控除・手取りをカードと表で表示
-2	折れ線グラフ	1‒12 月の収入／控除／手取りを Chart.js で描画
-3	月明細ビュー	1 クリックで詳細へ遷移（会社・勤怠・メモまで）
-4	CRUD	新規・編集・削除を API 1 本化 (/api/salaries/<id>)
-5	集計 API	GET /api/salaries?year=2025 で年フィルタ、&month=4月 で月フィルタ
+##   機能概要
+ - 年別ダッシュボード	総収入・総控除・手取りをカードと表で表示
+ - 折れ線グラフ	1‒12 月の収入／控除／手取りを Chart.js で描画
+ - 月明細ビュー	1 クリックで詳細へ遷移（会社・勤怠・メモまで）
+ - CRUD	新規・編集・削除を API 1 本化 (/api/salaries/<id>)
+ - 集計 API	GET /api/salaries?year=2025 で年フィルタ、&month=4月 で月フィルタ
 
-#   使用技術
-フロントエンド
-    Vue3
-    Vite
-バックエンド
-    Python 3.13.5
-    Flask
-    Flask-CORS
-グラフ
-    Chart.js
-    vue-chartjs
-データベース
-    SQLite3	(salaries.db（Git 無視推奨）)
+##   使用技術
+ - フロントエンド
+    -  Vue3
+    - Vite
+ - バックエンド
+    - Python 3.13.5
+    - Flask
+    - Flask-CORS
+ - グラフ
+    - Chart.js
+    - vue-chartjs
+ - データベース
+    - SQLite3	(salaries.db（Git 無視推奨）)
 
-#   ディレクトリ構成
+##   ディレクトリ構成
+<pre><code>```
 payroll-manager/
 ├─ backend/
 │  └─ app.py
@@ -39,16 +40,17 @@ payroll-manager/
 │  │   │   └─ index.js
 │  │   └─ main.js
 │  └─ vite.config.js
-├─ salaries.db               # ローカル DB（.gitignore 推奨）
+├─ salaries.db               # ローカル DB（.gitignore）
 ├─ requirements.txt
 └─ README.md
+```</code></pre>
 
-#   セットアップ
-バックエンド
-python3 -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\activate
-flask run     # → http://127.0.0.1:5000
+##   セットアップ
+ - バックエンド
+     - python3 -m venv venv
+     - source venv/bin/activate          # Windows: venv\Scripts\activate
+     - flask run
 
-フロントエンド
-npm install
-npm run dev    # → http://localhost:5173
+ - フロントエンド
+     - npm install
+     - npm run dev
