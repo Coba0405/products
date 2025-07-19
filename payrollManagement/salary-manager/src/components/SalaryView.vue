@@ -1,60 +1,3 @@
-<template>
-    <div v-if="detail" class="p-6">
-    <router-link
-        v-if="detail.id"
-        :to="{ name: 'salary-edit', params: { id: detail.id } }"
-        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4">
-        編集
-    </router-link>
-
-        <!-- ② レコードが無い月は「新規入力」ボタン -->
-    <router-link
-        v-else
-        :to="{
-                path: '/salary/new',
-                query: { year: props.year, month: props.month }
-            }"
-        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4">
-        新規入力
-    </router-link>
-
-    <button
-        v-if="detail?.id"
-        @click="onDelete"
-        class="mt-6 bg-red-600 text-white px-3 py-1 rounded"
-    >
-        削除
-    </button>
-
-        <h2 class="text-3xl text-left font-bold mb-4">
-            {{ props.year }}年 {{ props.month }} 明細
-        </h2>
-        <p>会社名: {{ detail.company }}</p>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Section title="勤怠" :rows="workRows" />
-            <Section title="支給" :rows="incomeRows" />
-            <Section title="控除" :rows="deductRows" />
-            <Section title="その他" :rows="otherRows" />
-            <Section
-                title="差引合計"
-                :rows="netRows"
-                outerClass="md:col-span-3"
-            />
-            <Section title="メモ" :rows="memoRows" />
-        </div>
-
-        <button
-            @click="goBack"
-            class="mb-4 inline-flex items-center gap-1 text-blue-600 hover:underline"
-        >
-            <span>{{ year }}年一覧へ戻る</span>
-        </button>
-    </div>
-
-    <p v-else-if="isError" class="text-red-500">データの取得に失敗しました</p>
-    <p v-else>読み込み中...</p>
-</template>
 
 <script setup>
 import { defineProps, onMounted, ref, computed } from 'vue'
@@ -64,8 +7,8 @@ import axios from 'axios'
 import Section from './Section.vue'
 
 const props = defineProps({
-    year: String,
-    month: String
+    year: { type: Number, required: true },
+    month: { type: String, required: true }
 })
 
 const router = useRouter()
@@ -76,17 +19,17 @@ function goBack () {
 }
 
 const blankDetail = {
-  id:        null,
-  company:   '',
-  base_salary: 0,  overtime_pay: 0,  allowances: 0,  transport: 0,
-  expense_reimburse: 0,  income_other: 0,
-  health_insurance: 0,   pension: 0,  employment_insurance: 0,
-  nursing_insurance: 0, income_tax: 0,  resident_tax: 0,  deduction_other: 0,  refund: 0,
-  working_days: 0, paid_leave: 0, working_hours: 0,
-  overtime_in: '', overtime_out: '', holiday_work: '',
-  memo: '',
-  year: props.year,   // ← ここは受け取った値で上書き
-  month: props.month
+    id:        null,
+    company:   '',
+    base_salary: 0,  overtime_pay: 0,  allowances: 0,  transport: 0,
+    expense_reimburse: 0,  income_other: 0,
+    health_insurance: 0,   pension: 0,  employment_insurance: 0,
+    nursing_insurance: 0, income_tax: 0,  resident_tax: 0,  deduction_other: 0,  refund: 0,
+    working_days: 0, paid_leave: 0, working_hours: 0,
+    overtime_in: '', overtime_out: '', holiday_work: '',
+    memo: '',
+    year: props.year,   // ← ここは受け取った値で上書き
+    month: props.month
 }
 
 const detail = ref(null)
@@ -184,3 +127,61 @@ async function onDelete () {
     }
 }
 </script>
+
+<template>
+    <div v-if="detail" class="p-6">
+    <router-link
+        v-if="detail.id"
+        :to="{ name: 'salary-edit', params: { id: detail.id } }"
+        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4">
+        編集
+    </router-link>
+
+        <!-- ② レコードが無い月は「新規入力」ボタン -->
+    <router-link
+        v-else
+        :to="{
+                path: '/salary/new',
+                query: { year: props.year, month: props.month }
+            }"
+        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4">
+        新規入力
+    </router-link>
+
+    <button
+        v-if="detail?.id"
+        @click="onDelete"
+        class="mt-6 bg-red-600 text-white px-3 py-1 rounded"
+    >
+        削除
+    </button>
+
+        <h2 class="text-3xl text-left font-bold mb-4">
+            {{ props.year }}年 {{ props.month }} 明細
+        </h2>
+        <p>会社名: {{ detail.company }}</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Section title="勤怠" :rows="workRows" />
+            <Section title="支給" :rows="incomeRows" />
+            <Section title="控除" :rows="deductRows" />
+            <Section title="その他" :rows="otherRows" />
+            <Section
+                title="差引合計"
+                :rows="netRows"
+                outerClass="md:col-span-3"
+            />
+            <Section title="メモ" :rows="memoRows" />
+        </div>
+
+        <button
+            @click="goBack"
+            class="mb-4 inline-flex items-center gap-1 text-blue-600 hover:underline"
+        >
+            <span>{{ year }}年へ戻る</span>
+        </button>
+    </div>
+
+    <p v-else-if="isError" class="text-red-500">データの取得に失敗しました</p>
+    <p v-else>読み込み中...</p>
+</template>

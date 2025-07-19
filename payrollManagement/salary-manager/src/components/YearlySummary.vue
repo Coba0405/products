@@ -1,6 +1,9 @@
 <template>
     <div class="p-6">
-        <router-link to="/IncomeByYear" class="block px-4 py-2 hover:bg-gray-100">
+        <router-link
+            :to="{ name: 'income-by-year', query: { year: currentYear } }"
+            class="block px-4 py-2 hover:bg-gray-100"
+        >
             年別所得
         </router-link>
         <div class="flex items-center mb-4 gap-2">

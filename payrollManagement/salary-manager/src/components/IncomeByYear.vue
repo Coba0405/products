@@ -1,8 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineProps } from 'vue'
+import { useRouter } from 'vue-router'
 // API呼び出しライブラリ
 import axios from 'axios';
 
+const props = defineProps({
+    year: {type: Number, required: true}
+})
+console.log(props.year)
+
+const router = useRouter()
 const rows = ref([]);
 // データ取得中かどうかを示すフラグをtrue(読み込み中)で初期化
 const loading = ref(true);
@@ -36,6 +43,9 @@ async function loadYearlySummary() {
         loading.value = false
     }
 }
+function goBack () {
+    router.push({ path: '/', query: {year: props.year } })
+}
 
 // コンポーネントが画面にマウントされたタイミングでloadYearlySummaryを自動実行する
 onMounted(loadYearlySummary)
@@ -68,14 +78,20 @@ onMounted(loadYearlySummary)
                 </tbody>
             </table>
         </div>
+        <button
+        @click="goBack"
+        class="mb-4 inline-flex items-center gap-1 text-blue-600 hover:underline"
+        >
+            <span>{{ props.year }}年へ戻る</span>
+        </button>
+        <!-- <YearLineChart
+            :labels = "labels"
+            :income="incomes"
+            :deduction="deductions"
+            :net="nets"
+            class="my-6"
+        /> -->
     </div>
-    <!-- <YearLineChart
-        :labels = "labels"
-        :income="incomes"
-        :deduction="deductions"
-        :net="nets"
-        class="my-6"
-    /> -->
 </template>
 
 
