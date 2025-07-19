@@ -1,5 +1,8 @@
 <template>
     <div class="p-6">
+        <router-link to="/IncomeByYear" class="block px-4 py-2 hover:bg-gray-100">
+            年別所得
+        </router-link>
         <div class="flex items-center mb-4 gap-2">
             <button @click="changeYear(-1)" class="text-xl px-2 py-1 hover:bg-gray-200 rounded">
                 ◀️
@@ -13,6 +16,7 @@
                 ▶️
             </button>
         </div>
+
         <YearLineChart
             :labels="labels"
             :income="incomes"
@@ -23,18 +27,18 @@
 
         <!-- 合計部分 -->
         <div class="flex flex-wrap justify-center gap-6">
-                <div class="bg-white shadow-md rounded-lg p-6 w-64 text-center">
-                    <p class="text-gray-500">総額収入</p>
-                    <p class="text-2xl font-bold text-blue-600">{{ totalIncome.toLocaleString() }}</p>
-                </div>
-                <div class="bg-white shadow-md rounded-lg p-6 w-64 text-center">
-                    <p class="text-gray-500">総額控除</p>
-                    <p class="text-2xl font-bold text-red-600">{{ totalDeduction.toLocaleString() }}</p>
-                </div>
-                <div class="bg-white shadow-md rounded-lg p-6 w-64 text-center">
-                    <p class="text-gray-500">総額手取</p>
-                    <p class="text-2xl font-bold text-green-600"> {{ netIncome.toLocaleString() }}</p>
-                </div>
+            <div class="bg-white shadow-md rounded-lg p-6 w-64 text-center">
+                <p class="text-gray-500">総額収入</p>
+                <p class="text-2xl font-bold text-blue-600">{{ totalIncome.toLocaleString() }}</p>
+            </div>
+            <div class="bg-white shadow-md rounded-lg p-6 w-64 text-center">
+                <p class="text-gray-500">総額控除</p>
+                <p class="text-2xl font-bold text-red-600">{{ totalDeduction.toLocaleString() }}</p>
+            </div>
+            <div class="bg-white shadow-md rounded-lg p-6 w-64 text-center">
+                <p class="text-gray-500">総額手取</p>
+                <p class="text-2xl font-bold text-green-600"> {{ netIncome.toLocaleString() }}</p>
+            </div>
         </div>
 
         <!-- 月別一覧 -->

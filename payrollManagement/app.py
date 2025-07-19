@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import sqlite3
 
-
 app = Flask(__name__)
 CORS(app)
 DB_PATH = 'salaries.db'
@@ -121,6 +120,38 @@ def salary_by_id(item_id):
     conn.commit()
     conn.close()
     return jsonify({'message': 'updated', 'id':item_id})
+
+@app.route('/IncomeByYear', methods=['GET'])
+def income_by_year():
+    year_get_db = 'salaries.db'
+    conn = sqlite3.connect(year_get_db)
+    # conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    sql = """
+    SELECT year, SUM(base_salary + overtime_pay + allowances + transport + expense_reimburse+  income_other) AS total_income,
+                 SUM(health_insurance + pension + employment_insurance + nursing_insurance + income_tax + resident_tax + deduction_other - refund) AS total_deduction
+    FROM salaries
+    GROUP BY year
+    ORDER BY year;
+    """
+
+    rows = cur.execute(sql).fetchall()
+
+    cur.close()
+    conn.close()
+
+    result = []
+    for year, income, deduction in rows:
+        net = income - deduction
+        result.append({
+            "year": year,
+            "income": income,
+            "deduction": deduction,
+            "net": net
+        })
+
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)
