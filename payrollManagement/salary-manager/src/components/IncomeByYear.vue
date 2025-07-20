@@ -1,11 +1,13 @@
 <script setup>
 import { ref, onMounted, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
+import YearLineChart from './YearLineChart.vue';
 // API呼び出しライブラリ
 import axios from 'axios';
 
+// この子コンポーネントはyearという数字を必ずもらうと宣言
 const props = defineProps({
-    year: {type: Number, required: true}
+    year: {type: Number, required: true},
 })
 console.log(props.year)
 
@@ -43,8 +45,11 @@ async function loadYearlySummary() {
         loading.value = false
     }
 }
+// @clickで呼ばれる関数
 function goBack () {
-    router.push({ path: '/', query: {year: props.year } })
+    // '/'の後ろに　?year=XXXX をつけるようrouterに依頼
+    // router.push({ path: '/', query: {year: props.year } }) historyを残す場合は.push
+    router.replace({ path: '/', query: {year: props.year} }) //historyを残さない場合は.replace
 }
 
 // コンポーネントが画面にマウントされたタイミングでloadYearlySummaryを自動実行する
