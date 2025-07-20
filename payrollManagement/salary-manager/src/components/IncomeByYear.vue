@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, defineProps } from 'vue'
+import { ref, onMounted, defineProps, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import YearLineChart from './YearLineChart.vue';
 // API呼び出しライブラリ
@@ -9,7 +9,7 @@ import axios from 'axios';
 const props = defineProps({
     year: {type: Number, required: true},
 })
-console.log(props.year)
+// console.log(props.year)
 
 const router = useRouter()
 const rows = ref([]);
@@ -54,16 +54,38 @@ function goBack () {
 
 // コンポーネントが画面にマウントされたタイミングでloadYearlySummaryを自動実行する
 onMounted(loadYearlySummary)
+
+// グラフ用computed (rowが更新されれば自動再計算)
+const yearLabels = computed(() => rows.value.map(row => String(row.year)))
+const yearIncome = computed(() => rows.value.map(row => row.income))
+const yearDeduction = computed(() => rows.value.map(row => row.deduction))
+const yearNet = computed(() => rows.value.map(row => row.net))
 </script>
 
 <template>
     <div class="p-6 space-y-4">
+        <h1 class="text-xl font-bold">年別一覧</h1>
+        <div v-if="loading" class="text-gray-500">Loading...</div>
+        <div v-else-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
+        <div v-else>
+            <div class="h-[360px]">
+                <YearLineChart
+                    :labels="yearLabels"
+                    :income="yearIncome"
+                    :deduction="yearDeduction"
+                    :net="yearNet"
+                    title="年別 収入 / 控除 / 手取り 推移"
+                    class="my-6 w-[45%] mx-auto"
+                />
+            </div>
+        </div>
+
         <h1 class="text-xl font-bold">年別取得（表表示フェーズ）</h1>
         <div v-if="loading" class="text-gray-500">Loading...</div>
         <div v-else-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
         <!-- ローディング、エラーのない(正常にデータがある)場合の表示ブロックを開始 -->
         <div v-else>
-            <table class="w-full table-auto border-collapse text-sm">
+            <table class="w-[45%] table-auto border-collapse text-sm mx-auto">
                 <thead>
                     <tr class="bg-gray-100">
                         <th class="border px-2 py-1">年</th>
@@ -89,13 +111,6 @@ onMounted(loadYearlySummary)
         >
             <span>{{ props.year }}年へ戻る</span>
         </button>
-        <!-- <YearLineChart
-            :labels = "labels"
-            :income="incomes"
-            :deduction="deductions"
-            :net="nets"
-            class="my-6"
-        /> -->
     </div>
 </template>
 

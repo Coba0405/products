@@ -14,7 +14,8 @@ const props = defineProps({
   labels:    { type: Array, default: () => [] },
   income:    { type: Array, default: () => [] },
   deduction: { type: Array, default: () => [] },
-  net:       { type: Array, default: () => [] }
+  net:       { type: Array, default: () => [] },
+  title: { type: String, default: '' }
 })
 
 // ---------- computed でそのまま渡す ----------
@@ -50,7 +51,13 @@ const chartOptions = computed(() => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      title: { display: true, text: `${props.labels[0] ?? ''}〜${props.labels[11] ??''} 推移` },
+      title: {
+        display: true,
+        text: props.title ||
+          (props.labels.length
+            ? `${props.labels[0] ?? ''}〜${props.labels[props.labels.length - 1] ??''} 推移`
+          : '')
+      },
       legend:{ position:'top' }
     },
     scales: {

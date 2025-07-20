@@ -12,14 +12,17 @@ const props = defineProps({
 })
 
 const router = useRouter()
+// リアクティブな変数'year'を作成し、props.yearをreturnしている
 const year = computed(() => props.year)
 
 function goBack () {
+    // '/?year=...'が付与される
     router.push({ path: '/', query: { year: props.year }})
 }
 
+// DBにまだデータが無い月を表示する
 const blankDetail = {
-    id:        null,
+    id:        null, //新規 or 編集の分岐に使用
     company:   '',
     base_salary: 0,  overtime_pay: 0,  allowances: 0,  transport: 0,
     expense_reimburse: 0,  income_other: 0,
@@ -35,7 +38,7 @@ const blankDetail = {
 const detail = ref(null)
 const isError = ref(false)
 
-// API呼び出し（階層　URL版）
+// API呼び出し
 onMounted(async () => {
   try {
     const { data } = await axios.get(
@@ -48,12 +51,12 @@ onMounted(async () => {
   }
 })
 
+// vが数値だった場合「,」をつけた表記にして' 円'を返す。数値じゃなければそのままvを返す
 const fmt = v => typeof v === 'number' ? v.toLocaleString() + ' 円' : v
 
-// 数値抽出ヘルパー
 function num(v){
     if (typeof v === 'number') return v
-    const n = Number(String(v).replace(/[^\d.-]/g, ''))
+    const n = Number(String(v).replace(/[^\d.-]/g, '')) //「.」と「-」以外を削除し置換する
     return isNaN(n) ? 0 : n
 }
 
@@ -137,7 +140,7 @@ async function onDelete () {
         編集
     </router-link>
 
-        <!-- ② レコードが無い月は「新規入力」ボタン -->
+    <!-- レコードが無い月は「新規入力」ボタン -->
     <router-link
         v-else
         :to="{
@@ -162,6 +165,7 @@ async function onDelete () {
         <p>会社名: {{ detail.company }}</p>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- '<Section ... />'でSection.vueをここに埋め込むことができる -->
             <Section title="勤怠" :rows="workRows" />
             <Section title="支給" :rows="incomeRows" />
             <Section title="控除" :rows="deductRows" />
