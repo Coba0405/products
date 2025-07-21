@@ -63,7 +63,7 @@ const yearNet = computed(() => rows.value.map(row => row.net))
 </script>
 
 <template>
-    <div class="p-6 space-y-4">
+    <div class="p-6 text-center space-y-4">
         <h1 class="text-xl font-bold">年別一覧</h1>
         <div v-if="loading" class="text-gray-500">Loading...</div>
         <div v-else-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
@@ -80,12 +80,12 @@ const yearNet = computed(() => rows.value.map(row => row.net))
             </div>
         </div>
 
-        <h1 class="text-xl font-bold">年別取得（表表示フェーズ）</h1>
+        <h1 class="text-xl font-bold">年別取得</h1>
         <div v-if="loading" class="text-gray-500">Loading...</div>
         <div v-else-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
         <!-- ローディング、エラーのない(正常にデータがある)場合の表示ブロックを開始 -->
         <div v-else>
-            <table class="w-[45%] table-auto border-collapse text-sm mx-auto">
+            <table class="w-[45%] table-auto border-collapse text-sm mx-auto mb-4">
                 <thead>
                     <tr class="bg-gray-100">
                         <th class="border px-2 py-1">年</th>
@@ -107,7 +107,7 @@ const yearNet = computed(() => rows.value.map(row => row.net))
         </div>
         <button
         @click="goBack"
-        class="mb-4 inline-flex items-center gap-1 text-blue-600 hover:underline"
+        class="inline-flex items-center gap-1 text-blue-600 hover:underline"
         >
             <span>{{ props.year }}年へ戻る</span>
         </button>

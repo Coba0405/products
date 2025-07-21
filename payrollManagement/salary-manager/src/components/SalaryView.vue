@@ -132,11 +132,11 @@ async function onDelete () {
 </script>
 
 <template>
-    <div v-if="detail" class="p-6">
+    <div v-if="detail" class="p-6 w-[60%] text-center mx-auto">
     <router-link
         v-if="detail.id"
         :to="{ name: 'salary-edit', params: { id: detail.id } }"
-        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4">
+        class="inline-block bg-blue-600 text-white px-3 py-1 rounded m-2">
         編集
     </router-link>
 
@@ -147,14 +147,14 @@ async function onDelete () {
                 path: '/salary/new',
                 query: { year: props.year, month: props.month }
             }"
-        class="inline-block bg-blue-600 text-white px-3 py-1 rounded mb-4">
+        class="inline-block bg-blue-600 text-white px-3 py-1 rounded m-2">
         新規入力
     </router-link>
 
     <button
         v-if="detail?.id"
         @click="onDelete"
-        class="mt-6 bg-red-600 text-white px-3 py-1 rounded"
+        class="mt-6 bg-red-600 text-white px-3 py-1 rounded m-2"
     >
         削除
     </button>
@@ -164,7 +164,7 @@ async function onDelete () {
         </h2>
         <p>会社名: {{ detail.company }}</p>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 mb-5 md:grid-cols-4 gap-4 mx-auto items-stretch">
             <!-- '<Section ... />'でSection.vueをここに埋め込むことができる -->
             <Section title="勤怠" :rows="workRows" />
             <Section title="支給" :rows="incomeRows" />
@@ -180,7 +180,7 @@ async function onDelete () {
 
         <button
             @click="goBack"
-            class="mb-4 inline-flex items-center gap-1 text-blue-600 hover:underline"
+            class="inline-flex items-center gap-1 text-blue-600 hover:underline"
         >
             <span>{{ year }}年へ戻る</span>
         </button>

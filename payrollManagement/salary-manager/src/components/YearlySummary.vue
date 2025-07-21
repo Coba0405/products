@@ -2,7 +2,7 @@
     <div class="p-6">
         <router-link
             :to="{ name: 'income-by-year', query: { year: currentYear } }"
-            class="flex px-4 py-2 hover:bg-gray-100 text-blue-600"
+            class="inline-flex items-left gap-1 px-4 py-2 text-blue-600 hover:bg-gray-100 rounded"
         >
             <strong>年別所得</strong>
         </router-link>
