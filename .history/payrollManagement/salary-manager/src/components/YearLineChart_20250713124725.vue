@@ -1,0 +1,135 @@
+<template>
+    <div class="h-[350px]">      <!-- 固定高さをあげても OK -->
+    <Line
+      ref="chartRef"
+      :data="chartData"
+      :options="chartOptions"
+    />
+  </div>
+</template>
+
+<script setup>
+import { Chart, LineElement, PointElement, LinearScale, Title, Legend, Tooltip, CategoryScale } from 'chart.js'
+Chart.register( LineElement, PointElement, LinearScale, Title, Legend, Tooltip, CategoryScale )
+
+import { Line } from 'vue-chartjs'
+import { reactive, watch, onMounted, ref, toRaw } from 'vue'
+
+/* ---------- props ---------- */
+const props = defineProps({
+  labels:     { type:Array, default:()=>[] },
+  income:     { type:Array, default:()=>[] },
+  deduction:  { type:Array, default:()=>[] },
+  net:        { type:Array, default:()=>[] }
+})
+
+/* ---------- データ ---------- */
+function buildData () {
+  return {
+    labels: props.labels,
+    datasets: [
+      {
+        label: '収入',
+        data: toRaw(props.income),
+        borderColor: '#42a5f5',
+        backgroundColor: 'transparent',
+        tension: .3
+      },
+      {
+        label: '控除',
+        data: toRaw(props.deduction),
+        borderColor: '#ef5350',
+        backgroundColor: 'transparent',
+        tension: .3
+      },
+      {
+        label: '手取り',
+        data: toRaw(props.net),
+        borderColor: '#66bb6a',
+        backgroundColor: 'transparent',
+        tension: .3
+      }
+    ]
+  }
+}
+
+
+// データ定義
+function makeData () {
+    return {
+        labels: props.labels,
+        datasets: [
+            {
+                label: '収入',
+                data: toRaw(props.income),
+                borderColor: '#e91e63',
+                tension: 0.3
+            },
+            {
+                label: '控除',
+                data: toRaw(props.deduction),
+                borderColor: '#ff9800',
+                tension: 0.3
+            },
+            {
+                label: '手取り',
+                data: toRaw(props.net),
+                borderColor: '#ffc107',
+                tension: 0.3
+            }
+        ]
+    }
+}
+
+function makeOptions () {
+    return {
+        responsive: true,
+        maintainAspentRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                suggestedMax: maxY() * 1.1,
+                ticks: { callback: v => v.toLocaleString() },
+                stepSize: 50000
+            }
+        }
+    }
+}
+const chartData = reactive( makeData() )
+const chartOptions = reactive( makeOptions() )
+
+watch(
+    () => [props.income, props.deduction, props.net],
+    () => {
+        Object.assign(chartData, makeData())
+        Object.assign(chartOptions, makeOptions())
+        if (chartRef.value?.chart) chartRef.value.chart.update()
+    }
+)
+
+const chartRef = ref(null)
+
+// 初期描画
+onMounted(() => {
+    // mounted時点でchartRef.value.chartが存在する
+})
+
+// Chart.js用のdataset
+// const data = {
+    //     labels: props.labels,
+    //     datasets: [
+        //         { label:'収入', data:props.income, borderColor:'#c026d3', backgroundColor:'#c026d3' },
+//         { label:'控除', data:props.deduction,  borderColor:'#fb923c', backgroundColor:'#fb923c' },
+//         { label:'手取り', data:props.net, borderColor:'#eab308', backgroundColor:'#eab308' }
+//     ]
+// }
+
+// const options = {
+//     responsive: true,
+//     maintainAspectRatio: false,
+//     tension: 0.3,
+//     scales: {
+//         y: { ticks: { callback:v=>v.toLocaleString() }}
+//     }
+// }
+</script>

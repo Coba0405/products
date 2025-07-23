@@ -1,0 +1,47 @@
+
+// salaries.dbにターミナルからの入力
+// ホームディレクトリ直下でsqlite3 salaries.dbを実行
+// sqlite>が表示されるので以下のフォーマットに沿って入力
+// INSERT INTO salaries (
+//   year, month, company,
+//   base_salary, overtime_pay, allowances, transport, expense_reimburse, income_other,
+//   health_insurance, pension, employment_insurance, nursing_insurance, social_insurance,
+//   income_tax, resident_tax, deduction_other, refund,
+//   working_days, paid_leave, working_hours, overtime_in, overtime_out, holiday_work,
+//   memo
+// ) VALUES (
+//   2025, '8月', 'キリがぶ株式会社',
+//   180000, 30000, 10000, 5000, 0, 0,
+//   10000, 20000, 1500, 0, 31500,
+//   5000, 8000, 0, 2000,
+//   20, 2, 160, '10h', '5h', '1日',
+//   '4月の給与'
+// );
+
+//   App.vue
+//   <template>
+//   <router-view />
+//   <div id="app" class="p-4"> -->
+//   <YearlySummary @select-month="openForm" />
+//   フォームは月が選ばれた時だけ表示
+//   <SalaryForm v-if="isFormOpen"
+//                 :initial-year="year"
+//                 :initial-month="selectedMonth"
+//                 @close="isFormOpen = false" />
+//   </div>
+// </template>
+
+// <script setup>
+// import { ref } from 'vue'
+// import YearlySummary from './components/YearlySummary.vue'
+// import SalaryForm from './components/SalaryForm.vue'
+
+// const year = new Date().getFullYear()
+// const selectedMonth =  ref('')
+// const isFormOpen = ref(false)
+
+// function openForm(month) {
+//   selectedMonth.value = month
+//   isFormOpen.value =true
+// }
+// </script>

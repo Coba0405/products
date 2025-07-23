@@ -1,0 +1,55 @@
+  year: new Date().getFullYear(),
+  month: '',
+  company: '',
+  base_salary: 0,
+  overtime_pay: 0,
+  allowances: 0,
+  transport: 0,
+  expense_reimburse: 0,
+  income_other: 0,
+  health_insurance: 0,
+  pension: 0,
+  employment_insurance: 0,
+  nursing_insurance: 0,
+  social_insurance: 0,
+  income_tax: 0,
+  resident_tax: 0,
+  deduction_other: 0,
+  refund: 0,
+  working_days: 0,
+  paid_leave: 0,
+  working_hours: 0,
+  overtime_in: '',
+  overtime_out: '',
+  holiday_work: '',
+  memo: 
+
+
+
+  App.vue
+  <template>
+  <router-view />
+  <div id="app" class="p-4"> -->
+  <YearlySummary @select-month="openForm" />
+  フォームは月が選ばれた時だけ表示
+  <SalaryForm v-if="isFormOpen"
+                :initial-year="year"
+                :initial-month="selectedMonth"
+                @close="isFormOpen = false" />
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import YearlySummary from './components/YearlySummary.vue'
+import SalaryForm from './components/SalaryForm.vue'
+
+const year = new Date().getFullYear()
+const selectedMonth =  ref('')
+const isFormOpen = ref(false)
+
+function openForm(month) {
+  selectedMonth.value = month
+  isFormOpen.value =true
+}
+</script>

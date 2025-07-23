@@ -1,0 +1,55 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { Line } from 'vue-chartjs'
+import YearLineChart from './YearLineChart.vue';
+import axios from 'axios';
+
+const rows = ref([]);
+const loading = ref(true);
+const error = ref('');
+const axios = require('axios').defaults;
+
+async function loadYearlySummary() {
+    loading.value = true
+    error.value = ''
+    try {
+        // バックエンドの現行ルート名に合わせる
+        const { data } = await axios.get('/IncomeByYear')
+        // const response = await axios.get({ year });
+        rows.value = [...data].sort((a, b) => a.year - b.year)
+        console.log(data);
+    }catch (error) {
+        console.error(error)
+        error.value = '年次データの取得に失敗しました'
+    } finally {
+        loading.value = false
+    }
+}
+
+onMounted(loadYear)
+// export default {
+//     setup() {
+//         const count = ref(0)
+//         return {
+//             count
+//         }
+//     },
+//     mounted() {
+//         console.log(this.count)
+//     }
+// }
+</script>
+
+<template>
+    <h2>Loading...</h2>
+    <button @click="count++">{{ count }}</button>
+    <!-- <YearLineChart
+        :labels = "labels"
+        :income="incomes"
+        :deduction="deductions"
+        :net="nets"
+        class="my-6"
+    /> -->
+</template>
+
+
