@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-import app as salary_app
+import payrollManagement.backend.app as salary_app
 
 SCHEMA = """
 CREATE TABLE salaries (

@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from pathlib import Path
 import sqlite3
 
 app = Flask(__name__)
 CORS(app)
-DB_PATH = 'salaries.db'
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH = str(BASE_DIR / 'salaries.db')
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -94,21 +96,21 @@ def salary_by_id(item_id):
     if request.method == 'PUT':
         d = request.get_json()
         conn.execute("""UPDATE salaries SET
-              year=?, month=?, company=?,
-              base_salary=?, overtime_pay=?, allowances=?, transport=?, expense_reimburse=?, income_other=?,
-              health_insurance=?, pension=?, employment_insurance=?, nursing_insurance=?,
-              income_tax=?, resident_tax=?, deduction_other=?, refund=?,
-              working_days=?, paid_leave=?, working_hours=?, overtime_in=?, overtime_out=?, holiday_work=?,
-              memo=? WHERE id=?""",
+                year=?, month=?, company=?,
+                base_salary=?, overtime_pay=?, allowances=?, transport=?, expense_reimburse=?, income_other=?,
+                health_insurance=?, pension=?, employment_insurance=?, nursing_insurance=?,
+                income_tax=?, resident_tax=?, deduction_other=?, refund=?,
+                working_days=?, paid_leave=?, working_hours=?, overtime_in=?, overtime_out=?, holiday_work=?,
+                memo=? WHERE id=?""",
             (
-              d['year'], d['month'], d['company'],
-              d['base_salary'], d['overtime_pay'], d['allowances'], d['transport'],
-              d['expense_reimburse'], d['income_other'],
-              d['health_insurance'], d['pension'], d['employment_insurance'],
-              d['nursing_insurance'],d['income_tax'], d['resident_tax'], d['deduction_other'], d['refund'],
-              d['working_days'], d['paid_leave'], d['working_hours'],
-              d['overtime_in'], d['overtime_out'], d['holiday_work'],
-              d['memo'], item_id
+                d['year'], d['month'], d['company'],
+                d['base_salary'], d['overtime_pay'], d['allowances'], d['transport'],
+                d['expense_reimburse'], d['income_other'],
+                d['health_insurance'], d['pension'], d['employment_insurance'],
+                d['nursing_insurance'],d['income_tax'], d['resident_tax'], d['deduction_other'], d['refund'],
+                d['working_days'], d['paid_leave'], d['working_hours'],
+                d['overtime_in'], d['overtime_out'], d['holiday_work'],
+                d['memo'], item_id
             )
         )
         conn.commit()
@@ -123,14 +125,14 @@ def salary_by_id(item_id):
 
 @app.route('/IncomeByYear', methods=['GET'])
 def income_by_year():
-    year_get_db = 'salaries.db'
-    conn = sqlite3.connect(year_get_db)
+    conn = get_db_connection()
+    # conn = sqlite3.connect(year_get_db)
     # conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
     sql = """
     SELECT year, SUM(base_salary + overtime_pay + allowances + transport + expense_reimburse+  income_other) AS total_income,
-                 SUM(health_insurance + pension + employment_insurance + nursing_insurance + income_tax + resident_tax + deduction_other - refund) AS total_deduction
+                    SUM(health_insurance + pension + employment_insurance + nursing_insurance + income_tax + resident_tax + deduction_other - refund) AS total_deduction
     FROM salaries
     GROUP BY year
     ORDER BY year;

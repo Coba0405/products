@@ -41,7 +41,7 @@
         </div>
 
         <!-- 月別一覧 -->
-        <table class="w-[45%] table-auto border-collapse mx-auto">
+        <table class="w-[45%] text-center table-auto border-collapse  mx-auto">
             <thead>
                 <tr class="bg-gray-200">
                     <th class="border p-2">月</th>
@@ -55,7 +55,7 @@
                     :key="row.month"
                     class="hover:bg-gray-100 cursor-pointer"
                     @click="$router.push({ path: `/salary/${currentYear}/${row.month}` })">
-                    <td class="border p-2">{{ row.month }}</td>
+                    <td class="block border p-2">{{ row.month }}</td>
                     <td class="border p-2 text-blue-600">{{ row.income.toLocaleString() }}</td>
                     <td class="border p-2 text-red-600">{{ row.deduction.toLocaleString() }}</td>
                     <td class="border p-2 text-green-600">{{ (row.income - row.deduction).toLocaleString() }}</td>
@@ -164,15 +164,15 @@ import YearLineChart from './YearLineChart.vue'
 
 <script>
 export default {
-  name: 'TotalCard',
-  props:{ label:String, value:Number, color:String },
-  template:`
-    <div class="bg-white shadow-md rounded-lg p-6 w-64 text-center">
-      <p class="text-gray-500">{{ label }}</p>
-      <p :class="'text-2xl font-bold text-' + color + '-600'">
-        {{ value.toLocaleString() }}
-      </p>
-    </div>
-  `
+    name: 'TotalCard',
+    props:{ label:String, value:Number, color:String },
+    template:`
+        <div class="bg-white shadow-md rounded-lg p-6 w-64 text-center">
+        <p class="text-gray-500">{{ label }}</p>
+        <p :class="'text-2xl font-bold text-' + color + '-600'">
+            {{ value.toLocaleString() }}
+        </p>
+        </div>
+    `
 }
 </script>
