@@ -1,134 +1,181 @@
 <template>
-  <div class="border p-6 rounded shadow-md bg-white max-w-2xl mx-auto">
-    <h3 class="text-xl font-bold mb-4 text-center">
-      {{ year }}年 {{ month }}の給与入力
-    </h3>
+  <div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-bold text-gray-800">
+        {{ year }}年{{ month ? ' ' + month : '' }} の給与入力
+      </h2>
+      <button type="button" @click="$router.back()" class="text-sm text-gray-400 hover:text-gray-600">
+        ✕ 閉じる
+      </button>
+    </div>
 
-    <!-- 入力フォーム -->
-    <form @submit.prevent="submitForm" class="text-flex">
+    <form @submit.prevent="submitForm" class="space-y-6">
+      <!-- 年・月 -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-gray-700">年</label>
+          <input
+            v-model.number="form.year"
+            type="number"
+            class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+            required
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-gray-700">月</label>
+          <select
+            v-model="form.month"
+            class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+            required
+          >
+            <option value="" disabled>選択してください</option>
+            <option v-for="m in months" :key="m" :value="m">{{ m }}</option>
+          </select>
+        </div>
+      </div>
+
       <!-- 会社名 -->
-      <div class="flex items-center gap-4 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">会社名</label>
-        <input v-model="form.company" type="text" class="input flex-1 rounded px-2 py-1 min-w-5 bg-gray-300" required />
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-gray-700">会社名</label>
+        <input
+          v-model="form.company"
+          type="text"
+          class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+          required
+        />
       </div>
 
-      <h2 class="text-center text-blue-600 mt-5">支給</h2>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">基本給</label>
-        <input v-model.number="form.base_salary" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
+      <!-- 支給 -->
+      <div class="border border-blue-100 rounded-lg overflow-hidden">
+        <div class="bg-blue-50 border-b border-blue-100 px-4 py-2">
+          <h3 class="font-semibold text-blue-700">支給</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-4 p-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">基本給</label>
+            <input v-model.number="form.base_salary" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">時間外勤務</label>
+            <input v-model.number="form.overtime_pay" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">各種手当</label>
+            <input v-model.number="form.allowances" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">交通費</label>
+            <input v-model.number="form.transport" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">立替経費</label>
+            <input v-model.number="form.expense_reimburse" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">その他収入</label>
+            <input v-model.number="form.income_other" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+        </div>
       </div>
 
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">時間外勤務</label>
-        <input v-model.number="form.overtime_pay" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
+      <!-- 控除 -->
+      <div class="border border-red-100 rounded-lg overflow-hidden">
+        <div class="bg-red-50 border-b border-red-100 px-4 py-2">
+          <h3 class="font-semibold text-red-600">控除</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-4 p-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">健康保険料</label>
+            <input v-model.number="form.health_insurance" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">厚生年金</label>
+            <input v-model.number="form.pension" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">雇用保険料</label>
+            <input v-model.number="form.employment_insurance" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">介護保険料</label>
+            <input v-model.number="form.nursing_insurance" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">所得税</label>
+            <input v-model.number="form.income_tax" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">住民税</label>
+            <input v-model.number="form.resident_tax" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">その他控除</label>
+            <input v-model.number="form.deduction_other" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">還付金</label>
+            <input v-model.number="form.refund" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+        </div>
       </div>
 
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">各種手当</label>
-        <input v-model.number="form.allowances" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
+      <!-- 勤怠 -->
+      <div class="border border-green-100 rounded-lg overflow-hidden">
+        <div class="bg-green-50 border-b border-green-100 px-4 py-2">
+          <h3 class="font-semibold text-green-700">勤怠</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-4 p-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">勤務日数</label>
+            <input v-model.number="form.working_days" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">有給休暇</label>
+            <input v-model.number="form.paid_leave" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">就労時間</label>
+            <input v-model.number="form.working_hours" type="number" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">法定内残業</label>
+            <input v-model="form.overtime_in" type="text" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">法定外残業</label>
+            <input v-model="form.overtime_out" type="text" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">休日出勤</label>
+            <input v-model="form.holiday_work" type="text" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" />
+          </div>
+        </div>
       </div>
 
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">交通費</label>
-        <input v-model.number="form.transport" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">立替経費</label>
-        <input v-model.number="form.expense_reimburse" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">その他収入</label>
-        <input v-model.number="form.income_other" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <h2 class="text-center text-red-600 mt-5">控除</h2>
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">健康保険料</label>
-        <input v-model.number="form.health_insurance" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">厚生年金</label>
-        <input v-model.number="form.pension" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">雇用保険料</label>
-        <input v-model.number="form.employment_insurance" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">介護保険料</label>
-        <input v-model.number="form.nursing_insurance" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">所得税</label>
-        <input v-model.number="form.income_tax" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">住民税</label>
-        <input v-model.number="form.resident_tax" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">その他控除</label>
-        <input v-model.number="form.deduction_other" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">還付金</label>
-        <input v-model.number="form.refund" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <h2 class="text-center text-green-600 mt-5">勤怠</h2>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">勤務日数</label>
-        <input v-model.number="form.working_days" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">有給休暇</label>
-        <input v-model.number="form.paid_leave" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">就労時間</label>
-        <input v-model.number="form.working_hours" type="number" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">法定内残業</label>
-        <input v-model="form.overtime_in" type="text" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">法定外残業</label>
-        <input v-model="form.overtime_out" type="text" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <div class="flex items-center gap-4 mt-5 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">休日出勤</label>
-        <input v-model="form.holiday_work" type="text" class="input flex-1 rounded px-2 py-1 bg-gray-300" />
-      </div>
-
-      <!-- ───── メモ ───── -->
-      <div class="flex items-center gap-4 mt-10 mr-10">
-        <label class="block w-20 shrink-0 text-sm mb-1">メモ</label>
-        <textarea v-model="form.memo" rows="3" class="input flex-1 rounded px-2 py-1 bg-gray-300"></textarea>
+      <!-- メモ -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-gray-700">メモ</label>
+        <textarea
+          v-model="form.memo"
+          rows="3"
+          class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+        ></textarea>
       </div>
 
       <!-- ボタン -->
-      <div class="flex justify-end gap-3 pt-4">
-        <button type="button" @click="$router.back()" class="text-sm text-gray-500">
-          閉じる
+      <div class="flex justify-end gap-3 pt-2">
+        <button
+          type="button"
+          @click="$router.back()"
+          class="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50"
+        >
+          キャンセル
         </button>
-        <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded">
+        <button
+          type="submit"
+          class="px-6 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+        >
           {{ id ? '更新' : '登録' }}
         </button>
       </div>
@@ -141,12 +188,15 @@ import { reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
-/* ---------- ルーティング情報 ---------- */
 const route  = useRoute()
 const router = useRouter()
-const id = route.params.id               // 文字列 (存在しなければ undefined)
+const id = route.params.id
 
-/* ---------- 初期値 ---------- */
+const months = [
+  '1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月',
+  '夏季賞与','冬季賞与','特別賞与'
+]
+
 const initialYear  = Number(route.query.year)  || new Date().getFullYear()
 const initialMonth =       route.query.month   || ''
 
@@ -178,7 +228,6 @@ const form = reactive({
   memo: ''
 })
 
-/* ---------- 既存データの読み込み ---------- */
 onMounted(async () => {
   if (id) {
     const { data } = await axios.get(`/api/salaries/${id}`)
@@ -190,11 +239,9 @@ onMounted(async () => {
   }
 })
 
-/* ---------- 見出し用 ---------- */
 const year  = computed(() => form.year)
 const month = computed(() => form.month)
 
-/* ---------- 送信 ---------- */
 async function submitForm () {
   if (id) {
     await axios.put(`/api/salaries/${id}`, form)

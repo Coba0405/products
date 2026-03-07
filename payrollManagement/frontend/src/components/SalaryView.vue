@@ -12,17 +12,14 @@ const props = defineProps({
 })
 
 const router = useRouter()
-// リアクティブな変数'year'を作成し、props.yearをreturnしている
 const year = computed(() => props.year)
 
 function goBack () {
-    // '/?year=...'が付与される
     router.push({ path: '/', query: { year: props.year }})
 }
 
-// DBにまだデータが無い月を表示する
 const blankDetail = {
-    id:        null, //新規 or 編集の分岐に使用
+    id:        null,
     company:   '',
     base_salary: 0,  overtime_pay: 0,  allowances: 0,  transport: 0,
     expense_reimburse: 0,  income_other: 0,
@@ -31,14 +28,13 @@ const blankDetail = {
     working_days: 0, paid_leave: 0, working_hours: 0,
     overtime_in: '', overtime_out: '', holiday_work: '',
     memo: '',
-    year: props.year,   // ← ここは受け取った値で上書き
+    year: props.year,
     month: props.month
 }
 
 const detail = ref(null)
 const isError = ref(false)
 
-// API呼び出し
 onMounted(async () => {
   try {
     const { data } = await axios.get(
@@ -51,16 +47,14 @@ onMounted(async () => {
   }
 })
 
-// vが数値だった場合「,」をつけた表記にして' 円'を返す。数値じゃなければそのままvを返す
 const fmt = v => typeof v === 'number' ? v.toLocaleString() + ' 円' : v
 
 function num(v){
     if (typeof v === 'number') return v
-    const n = Number(String(v).replace(/[^\d.-]/g, '')) //「.」と「-」以外を削除し置換する
+    const n = Number(String(v).replace(/[^\d.-]/g, ''))
     return isNaN(n) ? 0 : n
 }
 
-/* --- 行配列 --- */
 const incomeDetailRows = computed(() => detail.value ? [
   ['基本給',        detail.value.base_salary],
   ['時間外勤務',    detail.value.overtime_pay],
@@ -78,16 +72,14 @@ const deductDetailRows = computed(() => detail.value ? [
   ['所得税',        detail.value.income_tax],
   ['住民税',        detail.value.resident_tax],
   ['その他控除',    detail.value.deduction_other],
-  ['還付金',        -detail.value.refund],   // ー表記
+  ['還付金',        -detail.value.refund],
 ] : [])
 
-// 合計値
 const incomeTotal = computed(() =>
     incomeDetailRows.value.reduce((s, [,v]) => s + num(v), 0))
 const deductTotal = computed(() =>
     deductDetailRows.value.reduce((s, [,v]) => s + num(v), 0))
 
-// 画面表示用（明細 + 合計行）
 const incomeRows = computed(() =>
     incomeDetailRows.value.map(([l,v]) => [l, fmt(v)])
         .concat([['合計', fmt(incomeTotal.value)]]))
@@ -105,13 +97,9 @@ const workRows = computed(() => detail.value ? [
   ['休日出勤',   detail.value.holiday_work],
 ] : [])
 
-/* その他（今回:メモのみ空セル）*/
 const otherRows = computed(() => [['—', '']])
-
-/* メモ欄 */
 const memoRows = computed(() => [[detail.value?.memo || '—', '']])
 
-/* 差引合計 */
 const netRows = computed(() => [[
     '差引支給額',
     fmt(incomeTotal.value - deductTotal.value)
@@ -132,60 +120,57 @@ async function onDelete () {
 </script>
 
 <template>
-    <div v-if="detail" class="p-6 w-[60%] text-center mx-auto">
-    <router-link
-        v-if="detail.id"
-        :to="{ name: 'salary-edit', params: { id: detail.id } }"
-        class="inline-block bg-blue-600 text-white px-3 py-1 rounded m-2">
-        編集
-    </router-link>
-
-    <!-- レコードが無い月は「新規入力」ボタン -->
-    <router-link
-        v-else
-        :to="{
-                path: '/salary/new',
-                query: { year: props.year, month: props.month }
-            }"
-        class="inline-block bg-blue-600 text-white px-3 py-1 rounded m-2">
-        新規入力
-    </router-link>
-
-    <button
-        v-if="detail?.id"
-        @click="onDelete"
-        class="mt-6 bg-red-600 text-white px-3 py-1 rounded m-2"
-    >
-        削除
-    </button>
-
-        <h2 class="text-3xl text-left font-bold mb-4">
-            {{ props.year }}年 {{ props.month }} 明細
-        </h2>
-        <p>会社名: {{ detail.company }}</p>
-
-        <div class="grid grid-cols-1 mb-5 md:grid-cols-4 gap-4 mx-auto items-stretch">
-            <!-- '<Section ... />'でSection.vueをここに埋め込むことができる -->
-            <Section title="勤怠" :rows="workRows" />
-            <Section title="支給" :rows="incomeRows" />
-            <Section title="控除" :rows="deductRows" />
-            <Section title="その他" :rows="otherRows" />
-            <Section
-                title="差引合計"
-                :rows="netRows"
-                outerClass="md:col-span-3"
-            />
-            <Section title="メモ" :rows="memoRows" />
-        </div>
-
-        <button
-            @click="goBack"
-            class="inline-flex items-center gap-1 text-blue-600 hover:underline"
+  <div v-if="detail">
+    <!-- Top bar: back + actions -->
+    <div class="flex items-center justify-between mb-6">
+      <button
+        @click="goBack"
+        class="text-sm text-gray-500 hover:text-gray-800 flex items-center gap-1"
+      >
+        &#8592; {{ year }}年へ戻る
+      </button>
+      <div class="flex gap-2">
+        <router-link
+          v-if="detail.id"
+          :to="{ name: 'salary-edit', params: { id: detail.id } }"
+          class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-            <span>{{ year }}年へ戻る</span>
+          編集
+        </router-link>
+        <router-link
+          v-else
+          :to="{ path: '/salary/new', query: { year: props.year, month: props.month } }"
+          class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
+          新規入力
+        </router-link>
+        <button
+          v-if="detail?.id"
+          @click="onDelete"
+          class="bg-red-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-red-600"
+        >
+          削除
         </button>
+      </div>
     </div>
 
-    <p v-else-if="isError" class="text-red-500">データの取得に失敗しました</p>
-    <p v-else>読み込み中...</p>
+    <!-- Title -->
+    <h2 class="text-2xl font-bold text-gray-800 mb-1">
+      {{ props.year }}年 {{ props.month }} 明細
+    </h2>
+    <p class="text-sm text-gray-500 mb-6">{{ detail.company }}</p>
+
+    <!-- Detail Sections -->
+    <div class="grid grid-cols-1 mb-5 md:grid-cols-4 gap-4 mx-auto items-stretch">
+      <Section title="勤怠" :rows="workRows" />
+      <Section title="支給" :rows="incomeRows" />
+      <Section title="控除" :rows="deductRows" />
+      <Section title="その他" :rows="otherRows" />
+      <Section title="差引合計" :rows="netRows" outerClass="md:col-span-3" />
+      <Section title="メモ" :rows="memoRows" />
+    </div>
+  </div>
+
+  <p v-else-if="isError" class="text-red-500">データの取得に失敗しました</p>
+  <p v-else class="text-gray-400">読み込み中...</p>
 </template>

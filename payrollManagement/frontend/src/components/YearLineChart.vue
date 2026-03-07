@@ -9,6 +9,16 @@ import {
 Chart.register(LineElement, PointElement, LinearScale,
                CategoryScale, Title, Legend, Tooltip)
 
+Tooltip.positioners.offsetAbove = function (items, eventPosition) {
+  if (!items.length) return false
+  const isRightSide = eventPosition.x > this.chart.width * 0.6
+  return {
+    x: eventPosition.x + (isRightSide ? -40 : 40),
+    y: eventPosition.y - 40,
+    xAlign: isRightSide ? 'right' : 'left'
+  }
+}
+
 // ---------- props ----------
 const props = defineProps({
   labels:    { type: Array, default: () => [] },
@@ -26,19 +36,28 @@ const chartData = computed(() => ({
       label: '収入',
       data:   props.income,
       borderColor: '#42a5f5',
-      tension: 0
+      backgroundColor: '#42a5f520',
+      tension: 0,
+      pointRadius: 5,
+      pointHoverRadius: 8
     },
     {
       label: '控除',
       data:   props.deduction,
       borderColor: '#ef5350',
-      tension: 0
+      backgroundColor: '#ef535020',
+      tension: 0,
+      pointRadius: 5,
+      pointHoverRadius: 8
     },
     {
       label: '手取り',
       data:   props.net,
       borderColor: '#66bb6a',
-      tension: 0
+      backgroundColor: '#66bb6a20',
+      tension: 0,
+      pointRadius: 5,
+      pointHoverRadius: 8
     }
   ]
 }))
@@ -50,6 +69,10 @@ const chartOptions = computed(() => {
   return {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',
+      intersect: false
+    },
     plugins: {
       title: {
         display: true,
@@ -58,13 +81,21 @@ const chartOptions = computed(() => {
             ? `${props.labels[0] ?? ''}〜${props.labels[props.labels.length - 1] ??''} 推移`
           : '')
       },
-      legend:{ position:'top' }
+      legend: { position: 'top' },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+        position: 'offsetAbove',
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: ${Number(ctx.parsed.y).toLocaleString()} 円`
+        }
+      }
     },
     scales: {
       y: {
         beginAtZero: true,
         suggestedMax: max * 1.1,
-        ticks: { callback:v => Number(v).toLocaleString() }
+        ticks: { callback: v => Number(v).toLocaleString() }
       }
     }
   }

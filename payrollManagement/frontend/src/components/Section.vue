@@ -9,16 +9,24 @@ defineProps({
 
 <template>
     <div :class="['border rounded flex flex-col h-full', outerClass]">
-        <div class="bg-blue-700 text-white text-center font-semibold py-1">
+        <div class="bg-blue-700 text-white text-center font-semibold py-1.5 text-sm">
             {{ title }}
         </div>
 
         <table class="w-full flex-1">
             <tbody>
-                <!-- rowsの配列[0]に'label',[1]に'val'と名前をつけている -->
-                <tr v-for="[label,val] in rows" :key="label" class="border-line mt-auto">
-                    <td class="border-t px-2 text-sm">{{ label }}</td>
-                    <td class="border-t px-2 text-right text-sm">{{ val }}</td>
+                <tr
+                  v-for="[label,val] in rows"
+                  :key="label"
+                  :class="[
+                    'border-t',
+                    label === '合計' || label === '差引支給額'
+                      ? 'bg-gray-50 font-semibold'
+                      : ''
+                  ]"
+                >
+                    <td class="px-3 py-1.5 text-sm">{{ label }}</td>
+                    <td class="px-3 py-1.5 text-right text-sm">{{ val }}</td>
                 </tr>
                 <tr v-if="rows.length === 0">
                     <td class="h-24 bg-gray-50" colspan="2"></td>

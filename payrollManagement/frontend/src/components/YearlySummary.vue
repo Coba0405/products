@@ -1,68 +1,85 @@
 <template>
-    <div class="p-6">
-        <router-link
-            :to="{ name: 'income-by-year', query: { year: currentYear } }"
-            class="inline-flex items-left gap-1 px-4 py-2 text-blue-600 hover:bg-gray-100 rounded"
-        >
-            <strong>年別所得</strong>
-        </router-link>
-        <h2 class="text-2xl font-bold mb-4 text-center">
-            <button @click="changeYear(-1)" class="text-xl px-2 py-1 hover:bg-gray-200 rounded">
-                ◀️
-            </button>
-            {{ currentYear }}年の給与
-            <button @click="changeYear(+1)" class="text-xl px-2 py-1 hover:bg-gray-200 rounded">
-                ▶️
-            </button>
-        </h2>
-
-        <YearLineChart
-            :labels="labels"
-            :income="incomes"
-            :deduction="deductions"
-            :net="nets"
-            class="my-6 w-[45%] mx-auto"
-        />
-
-        <!-- 合計部分 -->
-        <div class="flex flex-wrap justify-center gap-6">
-            <div class="bg-white shadow-md rounded-lg p-6 w-64 m-8 text-center">
-                <p class="text-gray-500">総額収入</p>
-                <p class="text-2xl font-bold text-blue-600">{{ totalIncome.toLocaleString() }}</p>
-            </div>
-            <div class="bg-white shadow-md rounded-lg p-6 w-64 m-8 text-center">
-                <p class="text-gray-500">総額控除</p>
-                <p class="text-2xl font-bold text-red-600">{{ totalDeduction.toLocaleString() }}</p>
-            </div>
-            <div class="bg-white shadow-md rounded-lg p-6 w-64 m-8 text-center">
-                <p class="text-gray-500">総額手取</p>
-                <p class="text-2xl font-bold text-green-600"> {{ netIncome.toLocaleString() }}</p>
-            </div>
-        </div>
-
-        <!-- 月別一覧 -->
-        <table class="w-[45%] text-center table-auto border-collapse  mx-auto">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border p-2">月</th>
-                    <th class="border p-2">収入</th>
-                    <th class="border p-2">控除</th>
-                    <th class="border p-2">手取り</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="row in monthlyData"
-                    :key="row.month"
-                    class="hover:bg-gray-100 cursor-pointer"
-                    @click="$router.push({ path: `/salary/${currentYear}/${row.month}` })">
-                    <td class="block border p-2">{{ row.month }}</td>
-                    <td class="border p-2 text-blue-600">{{ row.income.toLocaleString() }}</td>
-                    <td class="border p-2 text-red-600">{{ row.deduction.toLocaleString() }}</td>
-                    <td class="border p-2 text-green-600">{{ (row.income - row.deduction).toLocaleString() }}</td>
-                </tr>
-            </tbody>
-        </table>
+  <div>
+    <!-- Year Navigation -->
+    <div class="flex items-center justify-center gap-4 mb-6">
+      <button
+        @click="changeYear(-1)"
+        class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 text-gray-600 text-lg font-bold"
+      >
+        &#8249;
+      </button>
+      <h2 class="text-2xl font-bold text-gray-800">{{ currentYear }}年の給与</h2>
+      <button
+        @click="changeYear(+1)"
+        class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 text-gray-600 text-lg font-bold"
+      >
+        &#8250;
+      </button>
     </div>
+
+    <!-- Chart -->
+    <YearLineChart
+      :labels="labels"
+      :income="incomes"
+      :deduction="deductions"
+      :net="nets"
+      class="mb-8 w-full max-w-2xl mx-auto"
+    />
+
+    <!-- Summary Cards -->
+    <div class="flex flex-wrap justify-center gap-4 mb-8">
+      <div class="bg-white shadow rounded-lg p-5 w-52 text-center">
+        <p class="text-sm text-gray-500 mb-1">総額収入</p>
+        <p class="text-xl font-bold text-blue-600">{{ totalIncome.toLocaleString() }} 円</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-5 w-52 text-center">
+        <p class="text-sm text-gray-500 mb-1">総額控除</p>
+        <p class="text-xl font-bold text-red-500">{{ totalDeduction.toLocaleString() }} 円</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-5 w-52 text-center">
+        <p class="text-sm text-gray-500 mb-1">総額手取</p>
+        <p class="text-xl font-bold text-green-600">{{ netIncome.toLocaleString() }} 円</p>
+      </div>
+    </div>
+
+    <!-- Monthly Table -->
+    <div class="max-w-2xl mx-auto bg-white shadow rounded-lg overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-100 text-gray-600 text-left">
+            <th class="px-5 py-3">月</th>
+            <th class="px-5 py-3 text-right">収入</th>
+            <th class="px-5 py-3 text-right">控除</th>
+            <th class="px-5 py-3 text-right">手取り</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="row in monthlyData"
+            :key="row.month"
+            :class="[
+              'border-t cursor-pointer transition-colors',
+              row.income > 0 || row.deduction > 0
+                ? 'hover:bg-blue-50'
+                : 'text-gray-300 hover:bg-gray-50'
+            ]"
+            @click="$router.push({ path: `/salary/${currentYear}/${row.month}` })"
+          >
+            <td class="px-5 py-3 font-medium">{{ row.month }}</td>
+            <td class="px-5 py-3 text-right text-blue-600">
+              {{ row.income > 0 ? row.income.toLocaleString() : '—' }}
+            </td>
+            <td class="px-5 py-3 text-right text-red-500">
+              {{ row.deduction > 0 ? row.deduction.toLocaleString() : '—' }}
+            </td>
+            <td class="px-5 py-3 text-right text-green-600">
+              {{ row.income > 0 ? (row.income - row.deduction).toLocaleString() : '—' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -96,7 +113,6 @@ import YearLineChart from './YearLineChart.vue'
 
     async function loadYearData () {
         try {
-            // `?year=` でフィルタして その年だけ取得
             const { data: raw } = await axios.get('/api/salaries',
                 { params:{ year: currentYear.value }
             })
@@ -134,23 +150,17 @@ import YearLineChart from './YearLineChart.vue'
             return { month: m, income, deduction }
             })
 
-            /* ====▼ 追加：グラフ用データを別に組み立てる ========= */
-            const REG_MONTH = /^\d+月$/                 // 1〜12月だけマッチ
+            /* グラフ用データ */
+            const REG_MONTH = /^\d+月$/
             const onlyMonthRows = monthlyData.value.filter(r => REG_MONTH.test(r.month))
 
-            // グラフ用ラベルと数値配列
             labels.value     = onlyMonthRows.map(r => r.month)
-            incomes.value  = onlyMonthRows.map(r => +r.income)
-            deductions.value  = onlyMonthRows.map(r => +r.deduction)
-            nets.value     = onlyMonthRows.map(r => +(r.income - r.deduction))
+            incomes.value    = onlyMonthRows.map(r => +r.income)
+            deductions.value = onlyMonthRows.map(r => +r.deduction)
+            nets.value       = onlyMonthRows.map(r => +(r.income - r.deduction))
         } catch (err) {
             console.error('年データ取得失敗', err)
         }
-
-        // console.log('labels', labels.value)
-        // console.log('incomes', incomes.value)
-        // console.log('deductions', deductions.value)
-        // console.log('nets', nets.value)
     }
 
     watch(currentYear, loadYearData, { immediate:true })
