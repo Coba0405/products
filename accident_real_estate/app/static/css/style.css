@@ -1,0 +1,205 @@
+/* ─── リセット・基本 ─────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+  font-size: 14px;
+  color: #222;
+  background: #f5f5f5;
+  line-height: 1.6;
+}
+
+a { color: #2563eb; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ─── ヘッダー ───────────────────────────────────── */
+.site-header {
+  background: #1e293b;
+  padding: 12px 24px;
+}
+.site-title {
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* ─── レイアウト ─────────────────────────────────── */
+.container {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 20px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.page-header h1 { font-size: 20px; }
+
+.header-actions { display: flex; gap: 8px; }
+
+/* ─── ボタン ─────────────────────────────────────── */
+.btn {
+  display: inline-block;
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  transition: opacity 0.15s;
+  text-decoration: none;
+}
+.btn:hover { opacity: 0.85; text-decoration: none; }
+.btn-primary  { background: #2563eb; color: #fff; border-color: #2563eb; }
+.btn-secondary{ background: #475569; color: #fff; border-color: #475569; }
+.btn-danger   { background: #dc2626; color: #fff; border-color: #dc2626; }
+.btn-ghost    { background: transparent; color: #475569; border-color: #cbd5e1; }
+.btn-sm       { padding: 4px 10px; font-size: 12px; }
+
+/* ─── 検索フォーム ───────────────────────────────── */
+.search-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  background: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+/* ─── フォーム共通 ───────────────────────────────── */
+.input-text, .input-select, .input-textarea {
+  padding: 7px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+}
+.input-text:focus, .input-select:focus, .input-textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px #dbeafe;
+}
+.input-text    { flex: 1; min-width: 200px; }
+.input-select  { min-width: 160px; }
+.input-textarea{ width: 100%; resize: vertical; }
+.input-file    { font-size: 13px; }
+
+.result-count { color: #64748b; margin-bottom: 10px; font-size: 13px; }
+
+/* ─── 物件一覧テーブル ───────────────────────────── */
+.property-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.property-table th {
+  background: #1e293b;
+  color: #fff;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 13px;
+}
+.property-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+.property-table tr:last-child td { border-bottom: none; }
+.property-table tr:hover td { background: #f8fafc; }
+.actions { display: flex; gap: 6px; }
+
+.empty-message { color: #94a3b8; text-align: center; padding: 40px; }
+
+/* ─── タグ・ステータス ───────────────────────────── */
+.tag, .status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+/* 事故種別タグ */
+.tag-suicide      { background: #fee2e2; color: #b91c1c; }
+.tag-homicide     { background: #fce7f3; color: #9d174d; }
+.tag-lonely_death { background: #fef3c7; color: #92400e; }
+.tag-fire         { background: #ffedd5; color: #c2410c; }
+.tag-other        { background: #f1f5f9; color: #475569; }
+/* 確認ステータス */
+.status-confirmed   { background: #dcfce7; color: #166534; }
+.status-unconfirmed { background: #fef9c3; color: #854d0e; }
+.status-rumor       { background: #f1f5f9; color: #64748b; }
+
+/* ─── 物件登録・編集フォーム ─────────────────────── */
+.property-form {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  max-width: 720px;
+}
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+.required { color: #dc2626; }
+.hint { color: #94a3b8; font-size: 12px; margin-top: 3px; display: block; }
+.form-actions { display: flex; gap: 10px; margin-top: 24px; }
+
+/* ─── 詳細カード ─────────────────────────────────── */
+.detail-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+.detail-list {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px 16px;
+  margin-bottom: 24px;
+}
+.detail-list dt { font-weight: 600; color: #475569; font-size: 13px; }
+.detail-list dd { font-size: 14px; }
+.detail-list dd.multiline { white-space: pre-wrap; }
+
+/* ─── 地図 ───────────────────────────────────────── */
+.map-section { margin-bottom: 24px; }
+.map-section h2 { font-size: 15px; margin-bottom: 10px; color: #1e293b; }
+.map-section iframe { border-radius: 6px; }
+
+/* ─── 画像グリッド ───────────────────────────────── */
+.images-section h2 { font-size: 15px; margin-bottom: 10px; color: #1e293b; }
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+.image-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.image-item img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+}
+.image-item small { color: #94a3b8; font-size: 11px; word-break: break-all; text-align: center; }

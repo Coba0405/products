@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}物件一覧 | 事故物件管理{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>物件一覧</h1>
+  <a href="/new" class="btn btn-primary">＋ 新規登録</a>
+</div>
+
+<!-- 検索・絞り込みフォーム -->
+<form method="get" action="/" class="search-form">
+  <input
+    type="text"
+    name="q"
+    value="{{ q }}"
+    placeholder="住所・概要・メモで検索"
+    class="input-text"
+  />
+  <select name="accident_type" class="input-select">
+    <option value="">事故種別（すべて）</option>
+    {% for at in accident_types %}
+    <option value="{{ at.name }}" {% if selected_accident_type == at.name %}selected{% endif %}>
+      {{ at.value }}
+    </option>
+    {% endfor %}
+  </select>
+  <select name="confirm_status" class="input-select">
+    <option value="">確認ステータス（すべて）</option>
+    {% for cs in confirm_statuses %}
+    <option value="{{ cs.name }}" {% if selected_confirm_status == cs.name %}selected{% endif %}>
+      {{ cs.value }}
+    </option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-secondary">検索</button>
+  <a href="/" class="btn btn-ghost">クリア</a>
+</form>
+
+<!-- 件数表示 -->
+<p class="result-count">{{ properties | length }} 件</p>
+
+<!-- 物件一覧テーブル -->
+{% if properties %}
+<table class="property-table">
+  <thead>
+    <tr>
+      <th>住所</th>
+      <th>事故種別</th>
+      <th>確認ステータス</th>
+      <th>登録日</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in properties %}
+    <tr>
+      <td><a href="/{{ p.id }}">{{ p.address }}</a></td>
+      <td><span class="tag tag-{{ p.accident_type }}">{{ p.accident_type }}</span></td>
+      <td><span class="status status-{{ p.confirm_status }}">{{ p.confirm_status }}</span></td>
+      <td>{{ p.created_at.strftime("%Y-%m-%d") }}</td>
+      <td class="actions">
+        <a href="/{{ p.id }}/edit" class="btn btn-sm">編集</a>
+        <form method="post" action="/{{ p.id }}/delete" style="display:inline"
+              onsubmit="return confirm('この物件を削除しますか？')">
+          <button type="submit" class="btn btn-sm btn-danger">削除</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty-message">該当する物件はありません。</p>
+{% endif %}
+{% endblock %}

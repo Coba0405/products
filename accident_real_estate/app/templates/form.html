@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | 事故物件管理{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ title }}</h1>
+  <a href="{{ '/' + property.id | string if property else '/' }}" class="btn btn-ghost">← 戻る</a>
+</div>
+
+<form method="post" action="{{ action }}" enctype="multipart/form-data" class="property-form">
+
+  <!-- 住所 -->
+  <div class="form-group">
+    <label for="address">住所 <span class="required">*</span></label>
+    <input
+      type="text"
+      id="address"
+      name="address"
+      value="{{ property.address if property else '' }}"
+      required
+      class="input-text"
+      placeholder="例：東京都新宿区○○1-2-3"
+    />
+  </div>
+
+  <!-- 事故種別 -->
+  <div class="form-group">
+    <label for="accident_type">事故種別 <span class="required">*</span></label>
+    <select id="accident_type" name="accident_type" required class="input-select">
+      {% for at in accident_types %}
+      <option value="{{ at.name }}"
+        {% if property and property.accident_type == at.name %}selected{% endif %}>
+        {{ at.value }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- 確認ステータス -->
+  <div class="form-group">
+    <label for="confirm_status">確認ステータス <span class="required">*</span></label>
+    <select id="confirm_status" name="confirm_status" required class="input-select">
+      {% for cs in confirm_statuses %}
+      <option value="{{ cs.name }}"
+        {% if property and property.confirm_status == cs.name %}selected
+        {% elif not property and cs.name == 'unconfirmed' %}selected
+        {% endif %}>
+        {{ cs.value }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- 事故概要 -->
+  <div class="form-group">
+    <label for="summary">事故概要</label>
+    <textarea id="summary" name="summary" rows="4" class="input-textarea"
+              placeholder="発生した事故の概要を記入してください">{{ property.summary if property and property.summary else '' }}</textarea>
+  </div>
+
+  <!-- メモ -->
+  <div class="form-group">
+    <label for="memo">メモ</label>
+    <textarea id="memo" name="memo" rows="3" class="input-textarea"
+              placeholder="自由メモ">{{ property.memo if property and property.memo else '' }}</textarea>
+  </div>
+
+  <!-- GoogleマップURL -->
+  <div class="form-group">
+    <label for="map_url">GoogleマップURL</label>
+    <input
+      type="url"
+      id="map_url"
+      name="map_url"
+      value="{{ property.map_url if property and property.map_url else '' }}"
+      class="input-text"
+      placeholder="https://maps.google.com/..."
+    />
+    <small class="hint">Googleマップで物件を開き、URLバーのURLをそのままコピーして貼り付けてください（goo.gl の短縮URLは使用不可）</small>
+  </div>
+
+  <!-- 画像添付 -->
+  <div class="form-group">
+    <label for="images">画像添付（複数可）</label>
+    <input type="file" id="images" name="images" multiple accept="image/*" class="input-file" />
+  </div>
+
+  <!-- 編集時：既存画像の表示と削除 -->
+  {% if property and property.images %}
+  <div class="form-group">
+    <label>登録済み画像</label>
+    <div class="image-grid">
+      {% for img in property.images %}
+      <div class="image-item">
+        <img src="/images/{{ img.filename }}" alt="{{ img.original_filename }}" />
+        <form method="post" action="/{{ property.id }}/images/{{ img.id }}/delete"
+              onsubmit="return confirm('この画像を削除しますか？')">
+          <button type="submit" class="btn btn-sm btn-danger">削除</button>
+        </form>
+        <small>{{ img.original_filename }}</small>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">保存</button>
+    <a href="{{ '/' + property.id | string if property else '/' }}" class="btn btn-ghost">キャンセル</a>
+  </div>
+
+</form>
+{% endblock %}

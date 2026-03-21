@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ property.address }} | 事故物件管理{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>物件詳細</h1>
+  <div class="header-actions">
+    <a href="/{{ property.id }}/edit" class="btn btn-secondary">編集</a>
+    <form method="post" action="/{{ property.id }}/delete" style="display:inline"
+          onsubmit="return confirm('この物件を削除しますか？')">
+      <button type="submit" class="btn btn-danger">削除</button>
+    </form>
+    <a href="/" class="btn btn-ghost">← 一覧に戻る</a>
+  </div>
+</div>
+
+<div class="detail-card">
+
+  <dl class="detail-list">
+    <dt>住所</dt>
+    <dd>{{ property.address }}</dd>
+
+    <dt>事故種別</dt>
+    <dd><span class="tag tag-{{ property.accident_type }}">{{ property.accident_type }}</span></dd>
+
+    <dt>確認ステータス</dt>
+    <dd><span class="status status-{{ property.confirm_status }}">{{ property.confirm_status }}</span></dd>
+
+    <dt>事故概要</dt>
+    <dd class="multiline">{{ property.summary or "—" }}</dd>
+
+    <dt>メモ</dt>
+    <dd class="multiline">{{ property.memo or "—" }}</dd>
+
+    <dt>登録日</dt>
+    <dd>{{ property.created_at.strftime("%Y年%m月%d日 %H:%M") }}</dd>
+
+    <dt>更新日</dt>
+    <dd>{{ property.updated_at.strftime("%Y年%m月%d日 %H:%M") }}</dd>
+  </dl>
+
+  <!-- Googleマップ -->
+  {% if property.map_url %}
+  <div class="map-section">
+    <h2>地図</h2>
+    {% if embed_url and "google.com/maps" in embed_url %}
+    <iframe
+      src="{{ embed_url }}"
+      width="100%"
+      height="400"
+      style="border:0;"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+    {% else %}
+    <p><a href="{{ property.map_url }}" target="_blank" rel="noopener">Googleマップで開く</a></p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- 画像 -->
+  {% if property.images %}
+  <div class="images-section">
+    <h2>画像（{{ property.images | length }}枚）</h2>
+    <div class="image-grid">
+      {% for img in property.images %}
+      <div class="image-item">
+        <a href="/images/{{ img.filename }}" target="_blank">
+          <img src="/images/{{ img.filename }}" alt="{{ img.original_filename }}" />
+        </a>
+        <small>{{ img.original_filename }}</small>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

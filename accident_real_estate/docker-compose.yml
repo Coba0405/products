@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # アプリコードのホットリロード
+      - ./app:/app/app
+      # 画像・DBはホスト側に永続化
+      - ./images:/app/images
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:////app/data/accident_real_estate.db
+      - IMAGES_DIR=/app/images
+    restart: unless-stopped
