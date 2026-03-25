@@ -1,14 +1,20 @@
 <template>
   <div>
     <!-- Year Navigation -->
-    <div class="flex items-center justify-center gap-4 mb-6">
+    <div class="flex items-center justify-center gap-4 mb-4">
       <button
         @click="changeYear(-1)"
         class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 text-gray-600 text-lg font-bold"
       >
         &#8249;
       </button>
-      <h2 class="text-2xl font-bold text-gray-800">{{ currentYear }}年の給与</h2>
+      <div class="flex flex-col items-center gap-1">
+        <h2 class="text-2xl font-bold text-gray-800">{{ currentYear }}年の給与</h2>
+        <router-link
+          :to="{ name: 'withholding-tax', params: { year: currentYear } }"
+          class="text-xs text-blue-500 hover:text-blue-700 hover:underline"
+        >源泉徴収票を見る</router-link>
+      </div>
       <button
         @click="changeYear(+1)"
         class="w-9 h-9 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 text-gray-600 text-lg font-bold"
@@ -39,6 +45,11 @@
       <div class="bg-white shadow rounded-lg p-5 w-52 text-center">
         <p class="text-sm text-gray-500 mb-1">総額手取</p>
         <p class="text-xl font-bold text-green-600">{{ netIncome.toLocaleString() }} 円</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-5 w-52 text-center">
+        <p class="text-sm text-gray-500 mb-1">課税対象収入</p>
+        <p class="text-xl font-bold text-purple-600">{{ totalTaxable.toLocaleString() }} 円</p>
+        <p class="text-xs text-gray-400 mt-1">交通費・経費除く</p>
       </div>
     </div>
 
@@ -101,6 +112,7 @@ import YearLineChart from './YearLineChart.vue'
     const totalIncome = ref(0)
     const totalDeduction = ref(0)
     const netIncome = ref(0)
+    const totalTaxable = ref(0)
 
     defineEmits(['select-month'])
 
@@ -121,6 +133,9 @@ import YearLineChart from './YearLineChart.vue'
             totalIncome.value = raw.reduce(
             (s,r)=> s + r.base_salary + r.overtime_pay + r.allowances + r.transport +
                         r.expense_reimburse + r.income_other, 0)
+
+            totalTaxable.value = raw.reduce(
+            (s,r)=> s + r.base_salary + r.overtime_pay + r.allowances + r.income_other, 0)
 
             totalDeduction.value = raw.reduce(
             (s,r)=> s + r.health_insurance + r.pension + r.employment_insurance +

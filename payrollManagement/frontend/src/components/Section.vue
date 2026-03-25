@@ -20,7 +20,7 @@ defineProps({
                   :key="label"
                   :class="[
                     'border-t',
-                    label === '合計' || label === '差引支給額'
+                    label === '合計' || label === '差引支給額' || label === '課税対象収入'
                       ? 'bg-gray-50 font-semibold'
                       : ''
                   ]"

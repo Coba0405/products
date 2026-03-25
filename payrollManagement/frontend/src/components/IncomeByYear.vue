@@ -83,6 +83,7 @@ const yearNet = computed(() => rows.value.map(row => row.net))
           <tr class="bg-gray-100 text-gray-600 text-left">
             <th class="px-5 py-3">年</th>
             <th class="px-5 py-3 text-right">収入</th>
+            <th class="px-5 py-3 text-right">課税対象収入</th>
             <th class="px-5 py-3 text-right">控除</th>
             <th class="px-5 py-3 text-right">手取り</th>
           </tr>
@@ -95,6 +96,7 @@ const yearNet = computed(() => rows.value.map(row => row.net))
           >
             <td class="px-5 py-3 font-medium">{{ row.year }}年</td>
             <td class="px-5 py-3 text-right text-blue-600">{{ row.income.toLocaleString() }}</td>
+            <td class="px-5 py-3 text-right text-purple-600">{{ row.taxable_income.toLocaleString() }}</td>
             <td class="px-5 py-3 text-right text-red-500">{{ row.deduction.toLocaleString() }}</td>
             <td class="px-5 py-3 text-right text-green-600">{{ row.net.toLocaleString() }}</td>
           </tr>

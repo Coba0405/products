@@ -20,6 +20,12 @@
             年別所得
           </router-link>
           <router-link
+            :to="{ name: 'withholding-tax', params: { year: new Date().getFullYear() } }"
+            class="text-gray-600 hover:text-blue-600 font-medium px-2 py-1 rounded hover:bg-gray-100"
+          >
+            源泉徴収票
+          </router-link>
+          <router-link
             to="/salary/new"
             class="bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 font-medium"
           >

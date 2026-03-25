@@ -56,13 +56,19 @@ function num(v){
 }
 
 const incomeDetailRows = computed(() => detail.value ? [
-  ['基本給',        detail.value.base_salary],
-  ['時間外勤務',    detail.value.overtime_pay],
-  ['各種手当',      detail.value.allowances],
-  ['交通費',        detail.value.transport],
-  ['立替経費',      detail.value.expense_reimburse],
-  ['その他収入',    detail.value.income_other],
+  ['基本給',              detail.value.base_salary],
+  ['時間外勤務',          detail.value.overtime_pay],
+  ['各種手当',            detail.value.allowances],
+  ['交通費（非課税）',    detail.value.transport],
+  ['立替経費（非課税）',  detail.value.expense_reimburse],
+  ['その他収入',          detail.value.income_other],
 ] : [])
+
+const taxableTotal = computed(() =>
+    num(detail.value?.base_salary) + num(detail.value?.overtime_pay) +
+    num(detail.value?.allowances) + num(detail.value?.income_other))
+
+const taxableRows = computed(() => [['課税対象収入', fmt(taxableTotal.value)]])
 
 const deductDetailRows = computed(() => detail.value ? [
   ['健康保険料',    detail.value.health_insurance],
@@ -161,13 +167,13 @@ async function onDelete () {
     <p class="text-sm text-gray-500 mb-6">{{ detail.company }}</p>
 
     <!-- Detail Sections -->
-    <div class="grid grid-cols-1 mb-5 md:grid-cols-4 gap-4 mx-auto items-stretch">
+    <div class="grid grid-cols-1 mb-5 md:grid-cols-3 gap-4 mx-auto items-stretch">
       <Section title="勤怠" :rows="workRows" />
       <Section title="支給" :rows="incomeRows" />
       <Section title="控除" :rows="deductRows" />
-      <Section title="その他" :rows="otherRows" />
-      <Section title="差引合計" :rows="netRows" outerClass="md:col-span-3" />
-      <Section title="メモ" :rows="memoRows" />
+      <Section title="課税対象" :rows="taxableRows" />
+      <Section title="差引合計" :rows="netRows" outerClass="md:col-span-2" />
+      <Section title="メモ" :rows="memoRows" outerClass="md:col-span-3" />
     </div>
   </div>
 

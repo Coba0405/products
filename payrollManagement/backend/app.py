@@ -13,30 +13,49 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# API接続確認用
-# @app.route('/')
-# def index():
-#     return '<h1>給与明細管理APIへようこそ！</h1><p>/api/salaries にアクセスしてください。</p>'
+def init_db():
+    conn = get_db_connection()
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS withholding_tax (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            year INTEGER NOT NULL UNIQUE,
+            company TEXT DEFAULT '',
+            payment_amount INTEGER DEFAULT 0,
+            after_deduction INTEGER DEFAULT 0,
+            total_income_deduction INTEGER DEFAULT 0,
+            withholding_tax_amount INTEGER DEFAULT 0,
+            social_insurance_amount INTEGER DEFAULT 0,
+            life_insurance_deduction INTEGER DEFAULT 0,
+            earthquake_insurance_deduction INTEGER DEFAULT 0,
+            housing_loan_deduction INTEGER DEFAULT 0,
+            spouse_deduction INTEGER DEFAULT 0,
+            dependent_count INTEGER DEFAULT 0,
+            memo TEXT DEFAULT ''
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+init_db()
 
 @app.route('/api/salaries', methods=['GET'])
 def get_salaries():
-    year  = request.args.get('year',  type=int)   # 無いときは None
-    month = request.args.get('month')             # 無いときは None
+    year  = request.args.get('year',  type=int)
+    month = request.args.get('month')
 
-    # --- 条件式を可変で組み立てる ---
     where   = []
     params  = []
 
-    if year is not None:          # 0 とは区別。int に変換済み
+    if year is not None:
         where.append('year = ?')
         params.append(year)
 
-    if month:                     # 空文字 '' は弾く
+    if month:
         where.append('month = ?')
         params.append(month)
 
     sql = 'SELECT * FROM salaries'
-    if where:                     # 条件が 1 つでもあれば WHERE 句を付ける
+    if where:
         sql += ' WHERE ' + ' AND '.join(where)
     sql += ' ORDER BY year DESC, month DESC'
 
@@ -117,38 +136,114 @@ def salary_by_id(item_id):
         conn.close()
         return jsonify({'message': 'updated', 'id': item_id})
 
-    # DELETEメソッド
     conn.execute('DELETE FROM salaries WHERE id = ?', (item_id,))
     conn.commit()
     conn.close()
-    return jsonify({'message': 'updated', 'id':item_id})
+    return jsonify({'message': 'deleted', 'id':item_id})
+
+# ── 源泉徴収票 ──────────────────────────────────────────────
+
+@app.route('/api/withholding_tax', methods=['GET'])
+def get_withholding_tax_list():
+    conn = get_db_connection()
+    rows = conn.execute('SELECT * FROM withholding_tax ORDER BY year DESC').fetchall()
+    conn.close()
+    return jsonify([dict(r) for r in rows])
+
+@app.route('/api/withholding_tax/<int:year>', methods=['GET'])
+def get_withholding_tax(year):
+    conn = get_db_connection()
+    row = conn.execute('SELECT * FROM withholding_tax WHERE year = ?', (year,)).fetchone()
+    conn.close()
+    if row is None:
+        return jsonify(None)
+    return jsonify(dict(row))
+
+@app.route('/api/withholding_tax', methods=['POST'])
+def create_withholding_tax():
+    data = request.get_json()
+    conn = get_db_connection()
+    conn.execute('''
+        INSERT INTO withholding_tax (
+            year, company, payment_amount, after_deduction,
+            total_income_deduction, withholding_tax_amount,
+            social_insurance_amount, life_insurance_deduction,
+            earthquake_insurance_deduction, housing_loan_deduction,
+            spouse_deduction, dependent_count, memo
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        data['year'], data.get('company', ''),
+        data.get('payment_amount', 0), data.get('after_deduction', 0),
+        data.get('total_income_deduction', 0), data.get('withholding_tax_amount', 0),
+        data.get('social_insurance_amount', 0), data.get('life_insurance_deduction', 0),
+        data.get('earthquake_insurance_deduction', 0), data.get('housing_loan_deduction', 0),
+        data.get('spouse_deduction', 0), data.get('dependent_count', 0),
+        data.get('memo', '')
+    ))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': '源泉徴収票を登録しました'}), 201
+
+@app.route('/api/withholding_tax/<int:item_id>', methods=['PUT', 'DELETE'])
+def withholding_tax_by_id(item_id):
+    conn = get_db_connection()
+
+    if request.method == 'PUT':
+        d = request.get_json()
+        conn.execute('''UPDATE withholding_tax SET
+            year=?, company=?, payment_amount=?, after_deduction=?,
+            total_income_deduction=?, withholding_tax_amount=?,
+            social_insurance_amount=?, life_insurance_deduction=?,
+            earthquake_insurance_deduction=?, housing_loan_deduction=?,
+            spouse_deduction=?, dependent_count=?, memo=?
+            WHERE id=?''',
+            (
+                d['year'], d.get('company', ''),
+                d.get('payment_amount', 0), d.get('after_deduction', 0),
+                d.get('total_income_deduction', 0), d.get('withholding_tax_amount', 0),
+                d.get('social_insurance_amount', 0), d.get('life_insurance_deduction', 0),
+                d.get('earthquake_insurance_deduction', 0), d.get('housing_loan_deduction', 0),
+                d.get('spouse_deduction', 0), d.get('dependent_count', 0),
+                d.get('memo', ''), item_id
+            )
+        )
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'updated', 'id': item_id})
+
+    conn.execute('DELETE FROM withholding_tax WHERE id = ?', (item_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'deleted', 'id': item_id})
+
+# ── 年別所得 ────────────────────────────────────────────────
 
 @app.route('/IncomeByYear', methods=['GET'])
 def income_by_year():
     conn = get_db_connection()
-    # conn = sqlite3.connect(year_get_db)
-    # conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
     sql = """
-    SELECT year, SUM(base_salary + overtime_pay + allowances + transport + expense_reimburse+  income_other) AS total_income,
-                    SUM(health_insurance + pension + employment_insurance + nursing_insurance + income_tax + resident_tax + deduction_other - refund) AS total_deduction
+    SELECT year,
+        SUM(base_salary + overtime_pay + allowances + transport + expense_reimburse + income_other) AS total_income,
+        SUM(base_salary + overtime_pay + allowances + income_other) AS taxable_income,
+        SUM(health_insurance + pension + employment_insurance + nursing_insurance + income_tax + resident_tax + deduction_other - refund) AS total_deduction
     FROM salaries
     GROUP BY year
     ORDER BY year;
     """
 
     rows = cur.execute(sql).fetchall()
-
     cur.close()
     conn.close()
 
     result = []
-    for year, income, deduction in rows:
+    for year, income, taxable, deduction in rows:
         net = income - deduction
         result.append({
             "year": year,
             "income": income,
+            "taxable_income": taxable,
             "deduction": deduction,
             "net": net
         })
