@@ -84,19 +84,26 @@ def create_salary():
         INSERT INTO salaries (
             year, month, company,
             base_salary, overtime_pay, allowances, transport, expense_reimburse, income_other,
+            lateness_deduction,
             health_insurance, pension, employment_insurance, nursing_insurance,
-            income_tax, resident_tax, deduction_other, refund,
+            child_care_support,
+            income_tax, resident_tax, reimburse_deduction, workation_fee, deduction_other, refund,
             working_days, paid_leave, working_hours, overtime_in, overtime_out, holiday_work,
+            late_early_time,
             memo
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data['year'], data['month'], data['company'],
         data['base_salary'], data['overtime_pay'], data['allowances'], data['transport'],
         data['expense_reimburse'], data['income_other'],
+        data.get('lateness_deduction', 0),
         data['health_insurance'], data['pension'], data['employment_insurance'],
-        data['nursing_insurance'], data['income_tax'], data['resident_tax'], data['deduction_other'], data['refund'],
+        data['nursing_insurance'],
+        data.get('child_care_support', 0),
+        data['income_tax'], data['resident_tax'], data.get('reimburse_deduction', 0), data.get('workation_fee', 0), data['deduction_other'], data['refund'],
         data['working_days'], data['paid_leave'], data['working_hours'],
         data['overtime_in'], data['overtime_out'], data['holiday_work'],
+        data.get('late_early_time', ''),
         data['memo']
     ))
     conn.commit()
@@ -117,18 +124,25 @@ def salary_by_id(item_id):
         conn.execute("""UPDATE salaries SET
                 year=?, month=?, company=?,
                 base_salary=?, overtime_pay=?, allowances=?, transport=?, expense_reimburse=?, income_other=?,
+                lateness_deduction=?,
                 health_insurance=?, pension=?, employment_insurance=?, nursing_insurance=?,
-                income_tax=?, resident_tax=?, deduction_other=?, refund=?,
+                child_care_support=?,
+                income_tax=?, resident_tax=?, reimburse_deduction=?, workation_fee=?, deduction_other=?, refund=?,
                 working_days=?, paid_leave=?, working_hours=?, overtime_in=?, overtime_out=?, holiday_work=?,
+                late_early_time=?,
                 memo=? WHERE id=?""",
             (
                 d['year'], d['month'], d['company'],
                 d['base_salary'], d['overtime_pay'], d['allowances'], d['transport'],
                 d['expense_reimburse'], d['income_other'],
+                d.get('lateness_deduction', 0),
                 d['health_insurance'], d['pension'], d['employment_insurance'],
-                d['nursing_insurance'],d['income_tax'], d['resident_tax'], d['deduction_other'], d['refund'],
+                d['nursing_insurance'],
+                d.get('child_care_support', 0),
+                d['income_tax'], d['resident_tax'], d.get('reimburse_deduction', 0), d.get('workation_fee', 0), d['deduction_other'], d['refund'],
                 d['working_days'], d['paid_leave'], d['working_hours'],
                 d['overtime_in'], d['overtime_out'], d['holiday_work'],
+                d.get('late_early_time', ''),
                 d['memo'], item_id
             )
         )
@@ -225,9 +239,9 @@ def income_by_year():
 
     sql = """
     SELECT year,
-        SUM(base_salary + overtime_pay + allowances + transport + expense_reimburse + income_other) AS total_income,
-        SUM(base_salary + overtime_pay + allowances + income_other) AS taxable_income,
-        SUM(health_insurance + pension + employment_insurance + nursing_insurance + income_tax + resident_tax + deduction_other - refund) AS total_deduction
+        SUM(base_salary + overtime_pay + allowances + transport + expense_reimburse + income_other + lateness_deduction) AS total_income,
+        SUM(base_salary + overtime_pay + allowances + income_other + lateness_deduction) AS taxable_income,
+        SUM(health_insurance + pension + employment_insurance + nursing_insurance + child_care_support + income_tax + resident_tax + reimburse_deduction + workation_fee + deduction_other - refund) AS total_deduction
     FROM salaries
     GROUP BY year
     ORDER BY year;
